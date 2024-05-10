@@ -1,4 +1,6 @@
-﻿namespace BaseLibrary.Models.Products
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace BaseLibrary.Models.Products
 {
     public class OrderDetail
     {
@@ -9,6 +11,7 @@
         public double Total { get; set; }
 
         // Quan hệ đến bảng Sản phẩm: Một chi tiết đơn hàng chỉ thuộc về một sản phẩm
+        [ForeignKey("Product")]
         public int ProductId { get; set; }
         public Product? Product { get; set; }
 
