@@ -27,6 +27,10 @@ namespace BaseLibrary.Models.Products
         [JsonIgnore]
         public List<Discount>? ProductDiscounts { get; set; } // Danh sách giảm giá
 
+        // Quan hệ đến bảng Chi tiết đơn hàng: Một - Nhiều
+        [JsonIgnore]
+        public List<OrderDetail>? OrderDetails { get; set; } // Danh sách chi tiết đơn hàng
+
         // Quan hệ đến bảng Danh mục: Nhiều - Một
         public int CategoryId { get; set; }
         public Category? Category { get; set; } // Danh mục sản phẩm
