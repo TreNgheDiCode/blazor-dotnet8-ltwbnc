@@ -75,10 +75,10 @@ namespace ServerLibrary.Repositories.Implementations
                 return new LoginResponse(false, "Thông tin đăng nhập chưa chính xác");
 
             // Kiểm tra role
-            var getUserRole = await appDbContext.UserRoles.FirstOrDefaultAsync(x => x.UserId == applicationUser.Id);
+            var getUserRole = await FindUserRole(applicationUser.Id);
             if (getUserRole is null) return new LoginResponse(false, "Quyền hạn không hợp lệ");
 
-            var getRoleName = await appDbContext.SystemRoles.FirstOrDefaultAsync(x => x.Id == getUserRole.RoleId);
+            var getRoleName = await FindRoleName(getUserRole.RoleId);
             if (getRoleName is null) return new LoginResponse(false, "Không tìm thấy quyền hạn người dùng");
 
             // Tạo token jwt
@@ -86,7 +86,67 @@ namespace ServerLibrary.Repositories.Implementations
             // Tạo refresh token
             string refreshToken = GenerateRefreshToken();
 
+            // Kiểm tra refresh token
+            var checkRefreshToken = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(x => x.UserId == applicationUser.Id);
+
+            if (checkRefreshToken is not null)
+            {
+                checkRefreshToken.Token = refreshToken;
+                await appDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                await AddToDatabase(new RefreshTokenInfo() { Token = refreshToken, UserId = applicationUser.Id });
+            }
+
             return new LoginResponse(true, "Đăng nhập thành công", jwtToken, refreshToken);
+        }
+
+        // Làm mới token
+        public async Task<LoginResponse> RefreshTokenAsync(RefreshToken refreshToken)
+        {
+            // Kiểm tra model có rỗng không
+            if (refreshToken is null) return new LoginResponse(false, "Vui lòng cung cấp đầy đủ thông tin");
+
+            // Kiểm tra token
+            var findToken = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(x => x.Token!.Equals(refreshToken.Token));
+            if (findToken is null) return new LoginResponse(false, "Không tìm thấy token");
+
+            // Kiểm tra user
+            var user = await appDbContext.ApplicationUsers.FirstOrDefaultAsync(x => x.Id == findToken.UserId);
+            if (user is null) return new LoginResponse(false, "Người dùng không tồn tại");
+
+            // Kiểm tra role
+            var getUserRole = await FindUserRole(user.Id);
+            if (getUserRole is null) return new LoginResponse(false, "Quyền hạn không hợp lệ");
+
+            var getRoleName = await FindRoleName(getUserRole.RoleId);
+            if (getRoleName is null) return new LoginResponse(false, "Không tìm thấy quyền hạn người dùng");
+
+            // Tạo token jwt
+            string jwtToken = GenerateToken(user, getRoleName.Name!);
+            // Tạo refresh token mới
+            string newRefreshToken = GenerateRefreshToken();
+
+            // Người dùng chưa đăng nhập - kiểm tra refresh token
+            var checkRefreshToken = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(x => x.UserId == user.Id);
+            if (checkRefreshToken is null) return new LoginResponse(false, "Phiên đăng nhập không tồn tại");
+
+            // Người dùng đã đăng nhập - cập nhật refresh token
+            checkRefreshToken.Token = newRefreshToken;
+            await appDbContext.SaveChangesAsync();
+
+            return new LoginResponse(true, "Làm mới token thành công", jwtToken, newRefreshToken);
+        }
+
+        private async Task<UserRole> FindUserRole(int userId)
+        {
+            return await appDbContext.UserRoles.FirstOrDefaultAsync(x => x.UserId == userId);
+        }
+
+        private async Task<SystemRole> FindRoleName(int roleId)
+        {
+            return await appDbContext.SystemRoles.FirstOrDefaultAsync(x => x.Id == roleId);
         }
 
         private string GenerateToken(ApplicationUser user, string role)

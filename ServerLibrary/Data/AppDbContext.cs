@@ -19,6 +19,7 @@ namespace ServerLibrary.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<ProductOption> ProductOptions { get; set; }
+        public DbSet<RefreshTokenInfo> RefreshTokenInfos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
