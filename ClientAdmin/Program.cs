@@ -2,6 +2,7 @@ using BaseLibrary.Helpers;
 using BaseLibrary.Helpers.Client;
 using Blazored.LocalStorage;
 using ClientAdmin;
+using ClientAdminLibrary.Helpers;
 using ClientAdminLibrary.Services.Contracts;
 using ClientAdminLibrary.Services.Implementations;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -13,6 +14,12 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+builder.Services.AddTransient<CustomHttpHandler>();
+builder.Services.AddHttpClient("SystemApiClient", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7016/");
+}).AddHttpMessageHandler<CustomHttpHandler>();
 
 builder.Services.AddAuthorizationCore();
 builder.Services.AddBlazoredLocalStorage();

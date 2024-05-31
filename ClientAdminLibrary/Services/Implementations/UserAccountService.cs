@@ -32,7 +32,14 @@ namespace ClientAdminLibrary.Services.Implementations
 
         public async Task<LoginResponse> RefreshTokenAsync(RefreshToken refreshToken)
         {
-            throw new NotImplementedException();
+            var httpClient = getHttpClient.GetPublicHttpClient();
+            var result = await httpClient.PostAsJsonAsync(AuthUrl + "/refresh-token", refreshToken);
+            if (!result.IsSuccessStatusCode)
+            {
+                return new LoginResponse(false, "Failed to create user");
+            }
+
+            return await result.Content.ReadFromJsonAsync<LoginResponse>();
         }
     }
 }
