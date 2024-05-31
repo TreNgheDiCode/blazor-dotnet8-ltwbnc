@@ -10,7 +10,7 @@ namespace BaseLibrary.DTOs
         public string? Fullname { get; set; }
 
         [DataType(DataType.Password)]
-        [Compare(nameof(Password))]
+        [Compare(nameof(Password), ErrorMessage = "Mật khẩu không trùng khớp")]
         [Required(ErrorMessage = "Vui lòng nhập lại mật khẩu")]
         public string? ConfirmPassword { get; set; }
     }
