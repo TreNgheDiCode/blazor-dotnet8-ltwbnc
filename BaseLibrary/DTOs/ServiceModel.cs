@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace BaseLibrary.DTOs
 {
-    public class ServiceCategory
+    public class ServiceModel<T>
     {
-        public List<Category>? ListCategory { get; set; } = null;
-        public Category? SingleCategory { get; set; }
+        public List<T>? List{ get; set; } = null;
+        public T? Single { get; set; } 
         public String? Message { get; set; } =null;
         public bool? Success { get; set; } = true;
        

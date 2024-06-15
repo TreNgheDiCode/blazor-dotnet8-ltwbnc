@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using ServerLibrary.Data;
 using ServerLibrary.Helpers;
 using ServerLibrary.Repositories.Contracts;
+using ServerLibrary.Repositories.Emplementations;
 using ServerLibrary.Repositories.Implementations;
+using ServerLibrary.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
+builder.Services.AddScoped<IProductRepo,ProductRepo >();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
