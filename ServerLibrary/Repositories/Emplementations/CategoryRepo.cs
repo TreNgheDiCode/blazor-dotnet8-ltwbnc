@@ -23,16 +23,16 @@ namespace ServerLibrary.Repositories.Emplementations
             this.appContext = appContext;
         }
 
-        public async Task<ServiceCategory> AddCategory(Category Newcategory)
+        public async Task<ServiceModel<Category>> AddCategory(Category Newcategory)
         {
-            var response=new ServiceCategory();
+            var response=new ServiceModel<Category>();
             if (Newcategory != null)
             {
                 try
                 {
                     appContext.Categories.Add(Newcategory);
                     await appContext.SaveChangesAsync();
-                    response.SingleCategory = Newcategory;
+                    response.Single = Newcategory;
                     response.Message = "Add Category Successfully!";
                     response.Success = true;
                     return response;
@@ -46,27 +46,27 @@ namespace ServerLibrary.Repositories.Emplementations
             {
                 response.Success= false;
                 response.Message = "Sorry New Category Opject is Empty";
-                response.SingleCategory= null;
+                response.Single= null;
                 return response;
             }
         }
 
-        public async Task<ServiceCategory> GetCategories()
+        public async Task<ServiceModel<Category>> GetCategories()
         {
-            var response = new ServiceCategory();
+            var response = new ServiceModel<Category>();
             try
             {
                 var categories = await appContext.Categories.ToListAsync();
                 if(categories!=null)
                 {
-                    response.ListCategory = categories;
+                    response.List = categories;
                     response.Success = true;
                     response.Message = "Found!";
                     return response;
                 }
                 else
                 {
-                    response.ListCategory = null;
+                    response.List = null;
                     response.Success = false;
                     response.Message = "Category not found!";
                     return response;
@@ -80,26 +80,26 @@ namespace ServerLibrary.Repositories.Emplementations
             }
         }
 
-        public async Task<ServiceCategory> GetCategory(int IdCategory)
+        public async Task<ServiceModel<Category>> GetCategory(int Id)
         {
-            var response = new ServiceCategory();
-            if (IdCategory != 0)
+            var response = new ServiceModel<Category>();
+            if (Id != 0)
             {
                 try
                 {
-                    var category =await appContext.Categories.SingleOrDefaultAsync(p=>p.Id== IdCategory);
+                    var category =await appContext.Categories.SingleOrDefaultAsync(p=>p.Id== Id);
                     if(category != null)
                     {
                         response.Success=true;
                         response.Message = "Product Found";
-                        response.SingleCategory = category;
+                        response.Single = category;
                         return response;
 
                     }else
                     {
                         response.Success=false;
                         response.Message = "Sorry! category you are looking for doesn't exist!";
-                        response.SingleCategory = null;
+                        response.Single = null;
                         return response;
 
                     }
@@ -115,17 +115,17 @@ namespace ServerLibrary.Repositories.Emplementations
             {
                 response.Success = false;
                 response.Message = "Sorry new category  object is empty!";
-                response.SingleCategory= null;
+                response.Single = null;
                 return response;
             }
         }
 
-        public async Task<ServiceCategory> UpdateCategory(int IdCategory, string? name)
+        public async Task<ServiceModel<Category>> UpdateCategory(int Id, string? name)
         {
-            var response = new ServiceCategory();
+            var response = new ServiceModel<Category>();
 
             // Fetch the category
-            var category = await GetCategory(IdCategory);
+            var category = await GetCategory(Id);
             if (category == null)
             {
                 // Return an error response if category does not exist
@@ -138,7 +138,7 @@ namespace ServerLibrary.Repositories.Emplementations
             {
                 try
                 {
-                    category.SingleCategory.Name = name;
+                    category.Single.Name = name;
                     await appContext.SaveChangesAsync();
 
                     response.Success = true;
@@ -160,15 +160,13 @@ namespace ServerLibrary.Repositories.Emplementations
             }
         }
 
-
-
-        public async Task<ServiceCategory> DeleteCategory(int IdCategory)
+        public async Task<ServiceModel<Category>> DeleteCategory(int Id)
         {
-            var response = new ServiceCategory();
-            var cate= await GetCategory(IdCategory);
-            if (cate.SingleCategory != null)
+            var response = new ServiceModel<Category>();
+            var cate= await GetCategory(Id);
+            if (cate.Single != null)
             {
-                appContext.Categories.Remove(cate.SingleCategory);
+                appContext.Categories.Remove(cate.Single);
                 await appContext.SaveChangesAsync();
                 response.Message = "Category Deleted!";
                 return response;
