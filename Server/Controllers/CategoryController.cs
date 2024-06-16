@@ -1,8 +1,6 @@
 ﻿using BaseLibrary.DTOs;
 using BaseLibrary.Models.Products;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ServerLibrary.Repositories.Emplementations;
 using ServerLibrary.Repositories.Interfaces;
 
 namespace Server.Controllers

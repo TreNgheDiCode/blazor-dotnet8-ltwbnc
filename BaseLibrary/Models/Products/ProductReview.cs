@@ -14,6 +14,6 @@
 
         // Quan hệ đến bảng Khách hàng: Nhiều - Một
         public int CustomerId { get; set; } // Mã khách hàng
-        public Customer? Customer { get; set; } // Khách hàng
+        public ApplicationUser? Customer { get; set; } // Khách hàng
     }
 }

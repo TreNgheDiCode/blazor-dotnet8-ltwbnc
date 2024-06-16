@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ServerLibrary.Data;
 using ServerLibrary.Helpers;
-using ServerLibrary.Repositories.Contracts;
+using ServerLibrary.Repositories.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -26,12 +26,32 @@ namespace ServerLibrary.Repositories.Implementations
             var checkUser = await FindUserByEmail(user.Email!);
             if (checkUser is not null) return new GeneralResponse(false, "Email đã được sử dụng");
 
+            // Kiểm tra phuong/xã/thị trấn có tồn tại không
+            var checkWard = await appDbContext.Wards.FirstOrDefaultAsync(x => x.Code == user.WardId);
+            if (checkWard is null) return new GeneralResponse(false, "Phường/xã/thị trấn không tồn tại");
+
+            // Kiểm tra quận/huyện có tồn tại không
+            var checkDistrict = await appDbContext.Districts.FirstOrDefaultAsync(x => x.Code == user.DistrictId);
+            if (checkDistrict is null) return new GeneralResponse(false, "Quận/huyện không tồn tại");
+
+            // Kiểm tra thành phố/tỉnh có tồn tại không
+            var checkProvince = await appDbContext.Provinces.FirstOrDefaultAsync(x => x.Code == user.ProvinceId);
+            if (checkProvince is null) return new GeneralResponse(false, "Thành phố/tỉnh không tồn tại");
+
             // Thêm user vào database
             var applicationUser = await AddToDatabase(new ApplicationUser()
             {
                 Fullname = user.Fullname,
                 Email = user.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(user.Password),
+                PhoneNumber = user.PhoneNumber,
+                Address = new Address()
+                {
+                    AddressDetail = user.Address,
+                    WardId = user.WardId,
+                    DistrictId = user.DistrictId,
+                    ProvinceId = user.ProvinceId
+                }
             });
 
             // Kiểm tra, tạo và gán role admin
@@ -80,6 +100,10 @@ namespace ServerLibrary.Repositories.Implementations
 
             var getRoleName = await FindRoleName(getUserRole.RoleId);
             if (getRoleName is null) return new LoginResponse(false, "Không tìm thấy quyền hạn người dùng");
+
+            // Nếu tài khoản bị khóa
+            if (applicationUser.IsLocked is not null && applicationUser.IsLocked == true)
+                return new LoginResponse(false, "Tài khoản đã bị khóa");
 
             // Tạo token jwt
             string jwtToken = GenerateToken(applicationUser, getRoleName.Name!);
