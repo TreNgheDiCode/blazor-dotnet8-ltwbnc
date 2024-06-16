@@ -1,4 +1,5 @@
 ﻿@page "/auth/login"
+@using BaseLibrary.DTOs.Auth
 @using ClientAdmin.Pages.Components
 
 @layout AuthenticationLayout
@@ -32,7 +33,7 @@
                          <div class="form-group mt-3">
                              @if (ShowLoadingButton)
                             {
-                                <ButtonLoadingSpinner />
+                                <ButtonLoadingSpinner></ButtonLoadingSpinner>
                             }
                             else
                             {

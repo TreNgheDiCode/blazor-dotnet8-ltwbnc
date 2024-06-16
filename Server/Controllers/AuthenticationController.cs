@@ -1,4 +1,4 @@
-﻿using BaseLibrary.DTOs;
+﻿using BaseLibrary.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerLibrary.Repositories.Interfaces;
