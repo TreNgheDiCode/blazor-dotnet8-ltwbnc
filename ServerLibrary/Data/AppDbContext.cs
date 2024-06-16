@@ -1,12 +1,12 @@
 ﻿using BaseLibrary.Models;
 using BaseLibrary.Models.Products;
+using KimVinhHung.Api.Models.Address;
 using Microsoft.EntityFrameworkCore;
 
 namespace ServerLibrary.Data
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
     {
-        public DbSet<Customer> Customers { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -14,6 +14,11 @@ namespace ServerLibrary.Data
         public DbSet<ProductReview> ProductReviews { get; set; }
         public DbSet<SystemRole> SystemRoles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<AdministrativeUnit> AdministrativeUnits { get; set; }
+        public DbSet<AdministrativeRegion> AdministrativeRegions { get; set; }
+        public DbSet<District> Districts { get; set; }
+        public DbSet<Province> Provinces { get; set; }
+        public DbSet<Ward> Wards { get; set; }
         public DbSet<Address> Addresses { get; set; }
         public DbSet<Discount> Discounts { get; set; }
         public DbSet<Order> Orders { get; set; }

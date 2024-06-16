@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServerLibrary.Data;
 
@@ -11,9 +12,11 @@ using ServerLibrary.Data;
 namespace ServerLibrary.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240616085100_DeleteCustomer")]
+    partial class DeleteCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,25 +33,22 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AddressDetail")
+                    b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DistrictId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("District")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProvinceId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Street")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("WardId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("Ward")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ZipCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DistrictId");
-
-                    b.HasIndex("ProvinceId");
-
-                    b.HasIndex("WardId");
 
                     b.ToTable("Addresses");
                 });
@@ -61,7 +61,7 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<DateOnly?>("CreatedAt")
@@ -387,201 +387,11 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeRegion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CodeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodeNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AdministrativeRegions");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeUnit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CodeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CodeNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShortName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ShortNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AdministrativeUnits");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("AdministrativeUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CodeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ProvinceCode")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Code");
-
-                    b.HasIndex("AdministrativeUnitId");
-
-                    b.HasIndex("ProvinceCode");
-
-                    b.ToTable("Districts");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Province", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("AdministrativeRegionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AdministrativeUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CodeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Code");
-
-                    b.HasIndex("AdministrativeRegionId");
-
-                    b.HasIndex("AdministrativeUnitId");
-
-                    b.ToTable("Provinces");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Ward", b =>
-                {
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int?>("AdministrativeUnitId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CodeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DistrictCode")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FullNameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameEn")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Code");
-
-                    b.HasIndex("AdministrativeUnitId");
-
-                    b.HasIndex("DistrictCode");
-
-                    b.ToTable("Wards");
-                });
-
-            modelBuilder.Entity("BaseLibrary.Models.Address", b =>
-                {
-                    b.HasOne("KimVinhHung.Api.Models.Address.District", "District")
-                        .WithMany()
-                        .HasForeignKey("DistrictId");
-
-                    b.HasOne("KimVinhHung.Api.Models.Address.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceId");
-
-                    b.HasOne("KimVinhHung.Api.Models.Address.Ward", "Ward")
-                        .WithMany()
-                        .HasForeignKey("WardId");
-
-                    b.Navigation("District");
-
-                    b.Navigation("Province");
-
-                    b.Navigation("Ward");
-                });
-
             modelBuilder.Entity("BaseLibrary.Models.ApplicationUser", b =>
                 {
                     b.HasOne("BaseLibrary.Models.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AddressId");
 
                     b.Navigation("Address");
                 });
@@ -691,51 +501,6 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
-                {
-                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeUnit", "AdministrativeUnit")
-                        .WithMany("Districts")
-                        .HasForeignKey("AdministrativeUnitId");
-
-                    b.HasOne("KimVinhHung.Api.Models.Address.Province", "ProvinceCodeNavigation")
-                        .WithMany("Districts")
-                        .HasForeignKey("ProvinceCode");
-
-                    b.Navigation("AdministrativeUnit");
-
-                    b.Navigation("ProvinceCodeNavigation");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Province", b =>
-                {
-                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeRegion", "AdministrativeRegion")
-                        .WithMany("Provinces")
-                        .HasForeignKey("AdministrativeRegionId");
-
-                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeUnit", "AdministrativeUnit")
-                        .WithMany("Provinces")
-                        .HasForeignKey("AdministrativeUnitId");
-
-                    b.Navigation("AdministrativeRegion");
-
-                    b.Navigation("AdministrativeUnit");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Ward", b =>
-                {
-                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeUnit", "AdministrativeUnit")
-                        .WithMany("Wards")
-                        .HasForeignKey("AdministrativeUnitId");
-
-                    b.HasOne("KimVinhHung.Api.Models.Address.District", "DistrictCodeNavigation")
-                        .WithMany("Wards")
-                        .HasForeignKey("DistrictCode");
-
-                    b.Navigation("AdministrativeUnit");
-
-                    b.Navigation("DistrictCodeNavigation");
-                });
-
             modelBuilder.Entity("BaseLibrary.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Discounts");
@@ -766,30 +531,6 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("ProductOptions");
 
                     b.Navigation("ProductReviews");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeRegion", b =>
-                {
-                    b.Navigation("Provinces");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeUnit", b =>
-                {
-                    b.Navigation("Districts");
-
-                    b.Navigation("Provinces");
-
-                    b.Navigation("Wards");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
-                {
-                    b.Navigation("Wards");
-                });
-
-            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Province", b =>
-                {
-                    b.Navigation("Districts");
                 });
 #pragma warning restore 612, 618
         }

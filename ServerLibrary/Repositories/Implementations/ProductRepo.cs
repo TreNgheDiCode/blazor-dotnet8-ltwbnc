@@ -48,7 +48,7 @@ namespace ServerLibrary.Repositories.Implementations
                     await appContext.Products.AddAsync(newProduct);
                     await appContext.SaveChangesAsync();
 
-                    response.Single = product;
+                    response.Data = product;
                     response.Message = "Product added successfully";
                     return response;
                 }
@@ -187,7 +187,7 @@ namespace ServerLibrary.Repositories.Implementations
                     CategoryId = product.CategoryId
                 };
 
-                response.Single = productDTO;
+                response.Data = productDTO;
                 response.Message = "Product retrieved successfully";
                 return response;
             }
@@ -223,7 +223,7 @@ namespace ServerLibrary.Repositories.Implementations
                     CategoryId = product.CategoryId
                 }).ToList();
 
-                response.List = productDTOs;
+                response.Data = null;
                 response.Message = "Products retrieved successfully";
                 return response;
             }

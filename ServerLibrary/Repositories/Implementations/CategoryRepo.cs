@@ -32,7 +32,7 @@ namespace ServerLibrary.Repositories.Implementations
                 {
                     appContext.Categories.Add(Newcategory);
                     await appContext.SaveChangesAsync();
-                    response.Single = Newcategory;
+                    response.Data = Newcategory;
                     response.Message = "Add Category Successfully!";
                     response.Success = true;
                     return response;
@@ -48,7 +48,7 @@ namespace ServerLibrary.Repositories.Implementations
             {
                 response.Success = false;
                 response.Message = "Sorry New Category Opject is Empty";
-                response.Single = null;
+                response.Data = null;
                 return response;
             }
         }
@@ -61,14 +61,14 @@ namespace ServerLibrary.Repositories.Implementations
                 var categories = await appContext.Categories.ToListAsync();
                 if (categories != null)
                 {
-                    response.List = categories;
+                    response.Data = null;
                     response.Success = true;
                     response.Message = "Found!";
                     return response;
                 }
                 else
                 {
-                    response.List = null;
+                    response.Data = null;
                     response.Success = false;
                     response.Message = "Category not found!";
                     return response;
@@ -94,7 +94,7 @@ namespace ServerLibrary.Repositories.Implementations
                     {
                         response.Success = true;
                         response.Message = "Product Found";
-                        response.Single = category;
+                        response.Data = category;
                         return response;
 
                     }
@@ -102,7 +102,7 @@ namespace ServerLibrary.Repositories.Implementations
                     {
                         response.Success = false;
                         response.Message = "Sorry! category you are looking for doesn't exist!";
-                        response.Single = null;
+                        response.Data = null;
                         return response;
 
                     }
@@ -119,7 +119,7 @@ namespace ServerLibrary.Repositories.Implementations
             {
                 response.Success = false;
                 response.Message = "Sorry new category  object is empty!";
-                response.Single = null;
+                response.Data = null;
                 return response;
             }
         }
@@ -142,7 +142,7 @@ namespace ServerLibrary.Repositories.Implementations
             {
                 try
                 {
-                    category.Single.Name = name;
+                    category.Data.Name = name;
                     await appContext.SaveChangesAsync();
 
                     response.Success = true;
@@ -168,9 +168,9 @@ namespace ServerLibrary.Repositories.Implementations
         {
             var response = new ServiceModel<Category>();
             var cate = await GetCategory(Id);
-            if (cate.Single != null)
+            if (cate.Data != null)
             {
-                appContext.Categories.Remove(cate.Single);
+                appContext.Categories.Remove(cate.Data);
                 await appContext.SaveChangesAsync();
                 response.Message = "Category Deleted!";
                 return response;
