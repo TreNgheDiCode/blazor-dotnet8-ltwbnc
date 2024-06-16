@@ -8,6 +8,8 @@ using ClientAdminLibrary.Services.Implementations;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Syncfusion.Blazor;
+using Syncfusion.Blazor.Popups;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -27,5 +29,12 @@ builder.Services.AddScoped<GetHttpClient>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+
+// Syncfusion
+builder.Services.Configure<SyncfusionSection>(builder.Configuration.GetSection("Syncfusion"));
+var syncfusionSection = builder.Configuration.GetSection(nameof(SyncfusionSection)).Get<SyncfusionSection>();
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfdnRWRmNeWEB2X0U=");
+builder.Services.AddSyncfusionBlazor();
+builder.Services.AddScoped<SfDialogService>();
 
 await builder.Build().RunAsync();
