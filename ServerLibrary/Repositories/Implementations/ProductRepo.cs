@@ -253,9 +253,9 @@ namespace ServerLibrary.Repositories.Implementations
                         UpdatedAt = pr.UpdatedAt,
                         User = new ProductItemReviewUserDetail
                         {
-                            Id = pr.Customer!.Id,
-                            FullName = pr.Customer.Fullname,
-                            Photo = pr.Customer.Photo
+                            Id = pr.User!.Id,
+                            FullName = pr.User.Fullname,
+                            Photo = pr.User.Photo
                         }
                     }).ToList()
                 })
@@ -341,9 +341,9 @@ namespace ServerLibrary.Repositories.Implementations
                         UpdatedAt = pr.UpdatedAt,
                         User = new ProductItemReviewUserDetail
                         {
-                            Id = pr.Customer!.Id,
-                            FullName = pr.Customer.Fullname,
-                            Photo = pr.Customer.Photo
+                            Id = pr.User!.Id,
+                            FullName = pr.User.Fullname,
+                            Photo = pr.User.Photo
                         }
                     }).ToList()
                 })

@@ -1,4 +1,4 @@
-﻿namespace BaseLibrary.DTOs.User
+﻿namespace BaseLibrary.DTOs
 {
     public record UserList
     {
