@@ -16,8 +16,8 @@ namespace BaseLibrary.Models.Products
         public DateTime OrderDate { get; set; }
 
         // Quan hệ đến bảng Khách hàng: Một đơn hàng chỉ thuộc về một khách hàng
-        public int CustomerId { get; set; }
-        public ApplicationUser? Customer { get; set; }
+        public int UserId { get; set; }
+        public ApplicationUser? User { get; set; }
 
         // Quan hệ đến bảng Sản phẩm: Một đơn hàng có thể chứa nhiều sản phẩm
         [JsonIgnore]

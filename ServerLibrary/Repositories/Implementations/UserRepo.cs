@@ -1,5 +1,4 @@
 ﻿using BaseLibrary.DTOs;
-using BaseLibrary.DTOs.User;
 using BaseLibrary.Models;
 using BaseLibrary.Responses;
 using Microsoft.EntityFrameworkCore;

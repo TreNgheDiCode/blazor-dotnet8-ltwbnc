@@ -13,7 +13,7 @@
         public Product? Product { get; set; } // Sản phẩm
 
         // Quan hệ đến bảng Khách hàng: Nhiều - Một
-        public int CustomerId { get; set; } // Mã khách hàng
-        public ApplicationUser? Customer { get; set; } // Khách hàng
+        public int UserId { get; set; } // Mã khách hàng
+        public ApplicationUser? User { get; set; } // Khách hàng
     }
 }

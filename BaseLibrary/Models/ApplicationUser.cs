@@ -23,7 +23,7 @@ namespace BaseLibrary.Models
 
         // Quan hệ đến bảng Giảm giá: Một - Nhiều
         [JsonIgnore]
-        public List<Discount>? Discounts { get; set; } // Danh sách giảm giá
+        public List<DiscountWarehouse>? Discounts { get; set; } // Danh sách giảm giá
 
         // Quan hệ đến bảng Đơn hàng: Một - Nhiều
         [JsonIgnore]

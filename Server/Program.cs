@@ -30,6 +30,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<IProductRepo,ProductRepo >();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IDiscountRepo, DiscountRepo>();
 
 builder.Services.Configure<JwtSection>(builder.Configuration.GetSection("JwtSection"));
 var jwtSection = builder.Configuration.GetSection(nameof(JwtSection)).Get<JwtSection>();

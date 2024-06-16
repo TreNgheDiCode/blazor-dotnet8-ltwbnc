@@ -25,6 +25,7 @@ namespace ServerLibrary.Data
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<ProductOption> ProductOptions { get; set; }
         public DbSet<RefreshTokenInfo> RefreshTokenInfos { get; set; }
+        public DbSet<DiscountWarehouse> DiscountWarehouses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
