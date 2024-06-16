@@ -13,6 +13,7 @@
     {
         public int Id { get; set; } // ID danh mục
         public string? Name { get; set; } // Tên danh mục
+        public int ProductCount { get; set; } // Số lượng sản phẩm
     }
 
     public record CreateCategoryDTO

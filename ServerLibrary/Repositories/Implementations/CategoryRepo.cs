@@ -67,7 +67,7 @@ namespace ServerLibrary.Repositories.Implementations
         {
             // Giá trị mặc định của page và pageSize
             int currentPage = page ?? 1; // Nếu page là null, trả về trang đầu tiên
-            int currentPageSize = pageSize ?? await context.ApplicationUsers.CountAsync(); // Nếu pageSize là null, trả về tất cả
+            int currentPageSize = pageSize ?? await context.Categories.CountAsync(); // Nếu pageSize là null, trả về tất cả
 
             // Tính tổng số lượng danh mục
             int totalCount = await context.Categories.CountAsync();
@@ -75,15 +75,16 @@ namespace ServerLibrary.Repositories.Implementations
             // Tính tổng số trang
             int totalPages = (int)Math.Ceiling(totalCount / (double)currentPageSize);
 
-            // Lấy danh sách danh mục
+            // Lấy danh sách danh mục, mỗi danh mục kèm số lượng sản phẩm của danh mục đó
             List<CategoryItem> categories = await context.Categories
-                .Skip((currentPage - 1) * currentPageSize)
-                .Take(currentPageSize)
                 .Select(c => new CategoryItem
                 {
                     Id = c.Id,
-                    Name = c.Name
+                    Name = c.Name,
+                    ProductCount = c.Products!.Count
                 })
+                .Skip((currentPage - 1) * currentPageSize)
+                .Take(currentPageSize)
                 .ToListAsync();
 
             // Nếu không có danh mục nào
@@ -116,12 +117,13 @@ namespace ServerLibrary.Repositories.Implementations
         public async Task<ServiceModel<CategoryItem>> GetCategory(int id)
         {
             // Lấy danh mục theo ID
-            CategoryItem category = await context.Categories
+            CategoryItem? category = await context.Categories
                 .Where(c => c.Id == id)
                 .Select(c => new CategoryItem
                 {
                     Id = c.Id,
-                    Name = c.Name
+                    Name = c.Name,
+                    ProductCount = c.Products.Count
                 })
                 .FirstOrDefaultAsync();
 
