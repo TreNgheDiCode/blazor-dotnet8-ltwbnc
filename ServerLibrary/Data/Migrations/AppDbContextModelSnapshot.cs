@@ -30,22 +30,25 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("City")
+                    b.Property<string>("AddressDetail")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("District")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("DistrictId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Street")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("ProvinceId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Ward")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ZipCode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("WardId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DistrictId");
+
+                    b.HasIndex("ProvinceId");
+
+                    b.HasIndex("WardId");
 
                     b.ToTable("Addresses");
                 });
@@ -58,10 +61,11 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("nvarchar(21)");
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("CreatedAt")
+                        .HasColumnType("date");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -69,16 +73,26 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<string>("Fullname")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("IsLocked")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Other")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Photo")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AddressId");
+
                     b.ToTable("ApplicationUsers");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ApplicationUser");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("BaseLibrary.Models.Products.Category", b =>
@@ -319,6 +333,25 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("ProductReviews");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Models.RefreshTokenInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RefreshTokenInfos");
+                });
+
             modelBuilder.Entity("BaseLibrary.Models.SystemRole", b =>
                 {
                     b.Property<int>("Id")
@@ -354,36 +387,208 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("UserRoles");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Models.Customer", b =>
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeRegion", b =>
                 {
-                    b.HasBaseType("BaseLibrary.Models.ApplicationUser");
-
-                    b.Property<int?>("AddressId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<DateOnly?>("CreatedAt")
-                        .HasColumnType("date");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool?>("IsLocked")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Other")
+                    b.Property<string>("CodeName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<string>("CodeNameEn")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Photo")
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("AddressId");
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasDiscriminator().HasValue("Customer");
+                    b.HasKey("Id");
+
+                    b.ToTable("AdministrativeRegions");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeUnit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CodeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CodeNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShortName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ShortNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AdministrativeUnits");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("AdministrativeUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ProvinceCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Code");
+
+                    b.HasIndex("AdministrativeUnitId");
+
+                    b.HasIndex("ProvinceCode");
+
+                    b.ToTable("Districts");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Province", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("AdministrativeRegionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AdministrativeUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Code");
+
+                    b.HasIndex("AdministrativeRegionId");
+
+                    b.HasIndex("AdministrativeUnitId");
+
+                    b.ToTable("Provinces");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Ward", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("AdministrativeUnitId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DistrictCode")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullNameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NameEn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Code");
+
+                    b.HasIndex("AdministrativeUnitId");
+
+                    b.HasIndex("DistrictCode");
+
+                    b.ToTable("Wards");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Models.Address", b =>
+                {
+                    b.HasOne("KimVinhHung.Api.Models.Address.District", "District")
+                        .WithMany()
+                        .HasForeignKey("DistrictId");
+
+                    b.HasOne("KimVinhHung.Api.Models.Address.Province", "Province")
+                        .WithMany()
+                        .HasForeignKey("ProvinceId");
+
+                    b.HasOne("KimVinhHung.Api.Models.Address.Ward", "Ward")
+                        .WithMany()
+                        .HasForeignKey("WardId");
+
+                    b.Navigation("District");
+
+                    b.Navigation("Province");
+
+                    b.Navigation("Ward");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("BaseLibrary.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("BaseLibrary.Models.Products.Discount", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.Customer", "Customer")
+                    b.HasOne("BaseLibrary.Models.ApplicationUser", "Customer")
                         .WithMany("Discounts")
                         .HasForeignKey("CustomerId");
 
@@ -398,7 +603,7 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Models.Products.Order", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.Customer", "Customer")
+                    b.HasOne("BaseLibrary.Models.ApplicationUser", "Customer")
                         .WithMany("Orders")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -469,7 +674,7 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Models.Products.ProductReview", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.Customer", "Customer")
+                    b.HasOne("BaseLibrary.Models.ApplicationUser", "Customer")
                         .WithMany("ProductReviews")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -486,13 +691,58 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Models.Customer", b =>
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("AddressId");
+                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeUnit", "AdministrativeUnit")
+                        .WithMany("Districts")
+                        .HasForeignKey("AdministrativeUnitId");
 
-                    b.Navigation("Address");
+                    b.HasOne("KimVinhHung.Api.Models.Address.Province", "ProvinceCodeNavigation")
+                        .WithMany("Districts")
+                        .HasForeignKey("ProvinceCode");
+
+                    b.Navigation("AdministrativeUnit");
+
+                    b.Navigation("ProvinceCodeNavigation");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Province", b =>
+                {
+                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeRegion", "AdministrativeRegion")
+                        .WithMany("Provinces")
+                        .HasForeignKey("AdministrativeRegionId");
+
+                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeUnit", "AdministrativeUnit")
+                        .WithMany("Provinces")
+                        .HasForeignKey("AdministrativeUnitId");
+
+                    b.Navigation("AdministrativeRegion");
+
+                    b.Navigation("AdministrativeUnit");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Ward", b =>
+                {
+                    b.HasOne("KimVinhHung.Api.Models.Address.AdministrativeUnit", "AdministrativeUnit")
+                        .WithMany("Wards")
+                        .HasForeignKey("AdministrativeUnitId");
+
+                    b.HasOne("KimVinhHung.Api.Models.Address.District", "DistrictCodeNavigation")
+                        .WithMany("Wards")
+                        .HasForeignKey("DistrictCode");
+
+                    b.Navigation("AdministrativeUnit");
+
+                    b.Navigation("DistrictCodeNavigation");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("Discounts");
+
+                    b.Navigation("Orders");
+
+                    b.Navigation("ProductReviews");
                 });
 
             modelBuilder.Entity("BaseLibrary.Models.Products.Category", b =>
@@ -518,13 +768,28 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("ProductReviews");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Models.Customer", b =>
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeRegion", b =>
                 {
-                    b.Navigation("Discounts");
+                    b.Navigation("Provinces");
+                });
 
-                    b.Navigation("Orders");
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.AdministrativeUnit", b =>
+                {
+                    b.Navigation("Districts");
 
-                    b.Navigation("ProductReviews");
+                    b.Navigation("Provinces");
+
+                    b.Navigation("Wards");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
+                {
+                    b.Navigation("Wards");
+                });
+
+            modelBuilder.Entity("KimVinhHung.Api.Models.Address.Province", b =>
+                {
+                    b.Navigation("Districts");
                 });
 #pragma warning restore 612, 618
         }
