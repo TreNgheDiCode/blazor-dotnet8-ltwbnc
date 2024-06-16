@@ -35,8 +35,6 @@
         public string? Role { get; set; } // Vai trò
     }
 
-    public record UserDelete(int Id);
-
     public record AddressDetail
     {
         public string Address { get; set; } = string.Empty; // Đường

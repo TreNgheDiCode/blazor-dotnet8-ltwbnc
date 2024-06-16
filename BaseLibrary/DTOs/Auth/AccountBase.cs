@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 
-namespace BaseLibrary.DTOs
+namespace BaseLibrary.DTOs.Auth
 {
     public class AccountBase
     {

@@ -1,45 +1,48 @@
 ﻿using BaseLibrary.DTOs;
-using BaseLibrary.Models.Products;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerLibrary.Repositories.Interfaces;
 
 namespace Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    [Authorize(Roles = "Admin")]
+    public class CategoryController(ICategoryRepo categoryRepo) : ControllerBase
     {
-        private readonly ICategoryRepo categoryRepo;
-        public CategoryController(ICategoryRepo categoryRepo)
+        [HttpGet]
+        public async Task<IActionResult> GetCategories(int? page, int? pageSize)
         {
-            this.categoryRepo = categoryRepo;
+            var result = await categoryRepo.GetCategories(page, pageSize);
+            return Ok(result);
         }
 
-        [HttpGet("Get-Category/{IdCategory:int}")]
-        public async Task<ActionResult<ServiceModel<Category>>> GetCategory(int IdCategory)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCategory(int id)
         {
-            return Ok(await categoryRepo.GetCategory(IdCategory));
-        }
-        [HttpPost("Add-Category")]
-        public async Task<ActionResult<ServiceModel<Category>>> AddCategory(Category category)
-        {
-            return Ok(await categoryRepo.AddCategory(category));
-        }
-        [HttpGet("Get-Categories")]
-        public async Task<ActionResult<ServiceModel<Category>>>GetCategories()
-        {
-            return Ok(await categoryRepo.GetCategories());
+            var result = await categoryRepo.GetCategory(id);
+            return Ok(result);
         }
 
-        [HttpDelete("Delete-Category/{IdCategory:int}")]
-        public async Task<ActionResult<ServiceModel<Category>>> DeteleCategory(int IdCategory)
+        [HttpPost]
+        public async Task<IActionResult> AddCategory(CreateCategoryDTO category)
         {
-            return Ok(await categoryRepo.DeleteCategory(IdCategory));
+            var result = await categoryRepo.AddCategory(category);
+            return Ok(result);
         }
-        [HttpPost("Update-Category/{IdCategory:int}")]
-        public async Task<ActionResult<ServiceModel<Category>>> UpdateCategory(int IdCategory,string? name)
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDTO category)
         {
-            return Ok(await categoryRepo.UpdateCategory(IdCategory,name));
+            var result = await categoryRepo.UpdateCategory(id, category);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var result = await categoryRepo.DeleteCategory(id);
+            return Ok(result);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using BaseLibrary.DTOs;
+﻿using BaseLibrary.DTOs.Auth;
 using BaseLibrary.Models;
 using BaseLibrary.Responses;
 using Microsoft.EntityFrameworkCore;

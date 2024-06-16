@@ -1,4 +1,4 @@
-﻿using BaseLibrary.DTOs;
+﻿using BaseLibrary.DTOs.Auth;
 using System.Net.Http.Headers;
 
 namespace BaseLibrary.Helpers.Client

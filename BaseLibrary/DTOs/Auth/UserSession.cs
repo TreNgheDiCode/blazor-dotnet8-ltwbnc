@@ -1,4 +1,4 @@
-﻿namespace BaseLibrary.DTOs
+﻿namespace BaseLibrary.DTOs.Auth
 {
     public class UserSession
     {

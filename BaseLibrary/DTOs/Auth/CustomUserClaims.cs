@@ -1,4 +1,4 @@
-﻿namespace BaseLibrary.DTOs
+﻿namespace BaseLibrary.DTOs.Auth
 {
     public record CustomUserClaims(string Id = null!, string Name = null!, string Email = null!, string Role = null!);
 }
