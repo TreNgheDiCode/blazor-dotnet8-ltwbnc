@@ -7,7 +7,7 @@ namespace Server.Controllers
 {
     [Route("api/categories")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class CategoryController(ICategoryRepo categoryRepo) : ControllerBase
     {
         [HttpGet]

@@ -1,0 +1,30 @@
+﻿
+<div class="row category">
+    <div class="col">
+        <ul class="list-group list-group-horizontal">
+            @if(cate!=null)
+            {
+                foreach (var item in cate.Categories)
+                {
+                    <li class="list-group-item"><a href="#">@item.Name</a></li>
+                }
+            }
+            
+        </ul>
+    </div>
+</div>
+
+@code {
+    private CategoryList? cate;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ServiceModel<CategoryList> result = await categoryService.GetCategories(1,1);
+
+        if (result.Success == true)
+        {
+            cate = result.Data;
+            
+        }
+    }
+}
