@@ -29,6 +29,7 @@ builder.Services.AddScoped<GetHttpClient>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Syncfusion
 builder.Services.Configure<SyncfusionSection>(builder.Configuration.GetSection("Syncfusion"));

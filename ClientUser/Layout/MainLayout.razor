@@ -1,16 +1,161 @@
 ﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokyolife - Fashion Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color:black;
+            color:white;
+            padding: 10px 20px;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        .icons a {
+            margin-left: 10px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-control {
+            margin-right: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        .btn {
+            padding: 5px 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background-color: #218838;
+            }
+
+        .category {
+            text-align: center;
+            padding: 10px 0;
+            background-color:forestgreen;
+            color: #fff;
+            display: flex;
+            margin: auto;
+        }
+
+            .category a {
+                text-decoration: none;
+                background-color:greenyellow;
+                margin: 0 10px;
+                color:black;
+                opacity: 0.5;
+            }
+
+        .container {
+            padding: 20px;
+        }
+
+        footer {
+            text-align: center;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .product-card {
+            background-color: #fff; /* White background for product cards */
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .product-card img {
+                width: 100%;
+                height: 150px;
+                object-fit: cover;
+                border-radius: 10px;
+                
+            }
+
+            .product-card h5 {
+                margin-top: 10px;
+                color: #333; /* Dark text color for product titles */
+            }
+
+            .product-card p {
+                margin-top: 5px;
+                font-size: 14px;
+                line-height: 1.5;
+                color: #333; /* Dark text color for descriptions */
+            }
+
+            .product-card .price {
+                font-weight: bold;
+                font-size: 16px;
+                margin-top: 10px;
+                color: #008000; /* Green color for price */
+            }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="logo">
+            <img src="images/logo.jpg" alt="Logo">
+        </div>
+        <div class="search-bar">
+            <input type="text" class="form-control" placeholder="Search products...">
+            <button class="btn">Tìm kiếm</button>
+        </div>
+        <div class="icons">
+            <a href="#"><i class="bi bi-cart"></i> Giỏ hàng </a>
+            <a href="/auth/login"><i class="bi bi-person-circle"></i> Đăng nhập</a>
+        </div>
     </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
+    <div class="category">
+            <NavCategory/>
+    </div>
 
-        <article class="content px-4">
+    <div class="container">
+        <div class="row">
             @Body
-        </article>
-    </main>
-</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Tokyolife. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
