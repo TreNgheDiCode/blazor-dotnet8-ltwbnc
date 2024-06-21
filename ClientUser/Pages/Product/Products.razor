@@ -1,0 +1,43 @@
+﻿@page "/user/products"
+@using BaseLibrary.DTOs
+@inject HttpClient httpClient
+
+
+<div class="col">
+    <h3 class="text-center mb-4">Products</h3>
+    @if (products != null && products.Products.Any())
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var product in products.Products)
+            {
+                <div class="col">
+                    <div class="product-card">
+                        <img src="images/logo.jpg" class="card-img-top img-fluid" alt="Product Image">
+                        <h5 class="card-title">@product.Name</h5>
+                        <p class="card-text">@product.Description</p>
+                        <div class="price">Price: <span>@product.Price</span></div>
+                        <button class="btn btn-danger">Add to Cart</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center">No products found.</p>
+    }
+
+</div>
+@code {
+    private ProductList? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ServiceModel<ProductList> result = await productService.GetProducts();
+
+        if (result.Success == true)
+        {
+            products = result.Data;
+        }
+    }
+}

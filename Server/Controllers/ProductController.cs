@@ -7,7 +7,8 @@ namespace Server.Controllers
 {
     [Route("api/products")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [AllowAnonymous]
+    //[Authorize(Roles = "Admin")]
     public class ProductController(IProductRepo productRepo) : ControllerBase
     {
         [HttpGet]

@@ -1,0 +1,34 @@
+﻿@page "/admin/products"
+@using BaseLibrary.DTOs
+@inject HttpClient httpClient
+
+<h3>Products</h3>
+
+@if (products != null)
+{
+    foreach (var product in products.Products)
+    {
+        <p>Product Name: @product.Name</p>
+        <p>Product Price: @product.Price</p>
+        <p>Product Description: @product.Description</p>
+        <p>Product Description: @product.Description</p>
+        <p>Product Description: @product.Description</p>
+    }
+}
+else
+{
+    <p>No product found.</p>
+}
+
+@code {
+    private ProductList? products = new();
+    protected override async Task OnInitializedAsync()
+    {
+        ServiceModel<ProductList> result = await productService.GetProducts();
+
+        if (result.Success == true)
+        {
+            products = result.Data;
+        }
+    }
+}
