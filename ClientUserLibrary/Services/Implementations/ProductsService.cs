@@ -15,9 +15,20 @@ namespace ClientUserLibrary.Services.Implementations
     {
         public const string ProductUrl = "api/products";
 
-        public Task<ServiceModel<ProductItem>> GetProduct(int id)
+        public async Task<ServiceModel<ProductItem>> GetProduct(int id)
         {
-            throw new NotImplementedException();
+            var client = httpClient.GetPublicHttpClient();
+            var result = await client.GetFromJsonAsync<ServiceModel<ProductItem>>($"./api/products/{id}");
+            if(result == null)
+            {
+                return new ServiceModel<ProductItem>()
+                {
+                    Data = new ProductItem(),
+                    Message = "Failed to get products",
+                    Success = false
+                };
+            }
+            return result;
         }
 
         public async Task<ServiceModel<ProductList>> GetProducts()

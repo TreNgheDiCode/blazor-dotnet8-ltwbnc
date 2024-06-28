@@ -1,0 +1,240 @@
+﻿@page "/products/detail/{ProductId:int}"
+@using ClientUserLibrary.Services.Contracts
+@inject IProductsService productService
+
+<h3>ProductDetail</h3>
+
+<style>
+    .product-page {
+        display: flex;
+        margin-top: 20px;
+    }
+
+    .product-image {
+        width: 40%;
+        margin-right: 20px;
+    }
+
+    .product-info {
+        width: 60%;
+    }
+
+    .product-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .product-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #ff0000;
+        margin-bottom: 10px;
+    }
+
+    .product-details {
+        margin-bottom: 20px;
+    }
+
+    .product-variations {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .product-variations label {
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .product-variations select {
+        width: 150px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .product-variations input {
+        width: 50px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .product-actions {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .product-actions button {
+        padding: 10px 10px;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .product-actions button.add-to-cart {
+        background-color: #ff0000;
+        color: white;
+    }
+
+    .product-actions button.wishlist {
+        background-color: #ff69b4;
+        color: white;
+    }
+
+    .product-actions button.find-store {
+        background-color: #008000;
+        color: white;
+    }
+
+    .product-images {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .product-images img {
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .breadcrumb {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+
+    .breadcrumb li {
+        margin-right: 5px;
+    }
+
+    .breadcrumb li a {
+        text-decoration: none;
+        color: #007bff;
+    }
+
+    .breadcrumb li::after {
+       
+        margin-left: 5px;
+    }
+
+    .breadcrumb li:last-child::after {
+        content: "";
+    }
+
+    .rating {
+        color: #ffcc00;
+        margin-bottom: 10px;
+    }
+</style>
+
+@if (loading)
+{
+    <div class="mt-auto">
+        <button class="btn btn-primary float-start" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Đang tải...
+        </button>
+    </div>
+}
+else
+{
+    @if (products != null)
+    {
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/products">Trang Chủ</a></li>
+                <li class="breadcrumb-item"><a href="/products">Sản Phẩm</a></li>
+                <li class="breadcrumb-item active" aria-current="page">@products.Name</li>
+            </ol>
+        </nav>
+
+        <div class="product-page">
+            <div class="product-image">
+                <img src="/logongang.png" class="img-fluid" alt="Product Image">
+            </div>
+            <div class="product-info">
+                <h3 class="product-title">@products.Name</h3>
+                <div class="rating">
+                            <div>Đánh giá: @(products.ProductReviews.FirstOrDefault()?.Rating)</div>
+                </div>
+                <div class="product-price">@string.Format("{0:0,0 đồng}", products.Price)</div>
+                <div class="product-details">@products.Description</div>
+                <div class="product-details">Số Lượng: @products.ProductOptions.Sum(i=>i.Quantity) Sản phẩm</div>
+                <div class="product-variations">
+                    <label for="size">Chọn kích thước:</label>
+                    <select id="size">
+                        @foreach (var option in products.ProductOptions)
+                        {
+                            <option value="@option.Size ">@option.Size</option>
+                        }
+                    </select>
+                    
+                </div>
+                <div class="product-variations">
+                    <label for="size">Chọn màu sắc:</label>
+                    <select id="Color">
+                        @foreach (var option in products.ProductOptions)
+                        {
+                            <option value="@option.Color ">@option.Color</option>
+                        }
+                    </select>
+                </div>
+                
+                <div class="product-actions">
+                    <button class="add-to-cart">Thêm vào Giỏ Hàng</button>
+                    <button class="wishlist">Yêu Thích</button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>No products found.</p>
+    }
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+    private bool loading = true;
+    private ProductItem? products;
+    private string message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        try
+        {
+            var result = await productService.GetProduct(ProductId);
+            if (result.Success==true && result.Data?.Id!=null)
+            {
+                products = result.Data;
+            }
+            else
+            {
+                products = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"An error occurred: {ex.Message}";
+            products = null;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+}

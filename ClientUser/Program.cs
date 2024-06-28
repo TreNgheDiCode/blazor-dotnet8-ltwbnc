@@ -21,7 +21,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddTransient<CustomHttpHandler>();
 builder.Services.AddHttpClient("SystemApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7016/");
+    client.BaseAddress = new Uri("https://localhost:7016/products");
     client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*"); // Thêm header này n?u c?n thi?t
 }).AddHttpMessageHandler<CustomHttpHandler>();
 

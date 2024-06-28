@@ -1,16 +1,17 @@
 ﻿
 <div class="row category">
     <div class="col">
-        <ul class="list-group list-group-horizontal">
+        <div class="list-group list-group-horizontal">
+            
             @if(cate!=null)
             {
+                <div class=""><a href="/products">Trang Chủ</a></div>
                 foreach (var item in cate.Categories)
                 {
-                    <li class="list-group-item"><a href="#">@item.Name</a></li>
+                    <div class=""><a href="/category/@item.Id">@item.Name</a></div>
                 }
             }
-            
-        </ul>
+         </div>
     </div>
 </div>
 
