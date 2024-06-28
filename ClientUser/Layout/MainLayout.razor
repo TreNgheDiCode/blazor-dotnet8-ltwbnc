@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +8,7 @@
     <title>Tokyolife - Fashion Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
+  @*   <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -18,19 +19,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color:black;
-            color:white;
+            background-color:white;
+            color:black;
             padding: 10px 20px;
         }
 
         .logo img {
-            height: 50px;
+            height: 64px;
+            width: 128px;
         }
 
         .icons a {
             margin-left: 10px;
             text-decoration: none;
-            color: white;
+            color: black;
         }
 
         .search-bar {
@@ -61,20 +63,43 @@
 
         .category {
             text-align: center;
-            padding: 10px 0;
+            padding: 10px 20px;
             background-color:forestgreen;
             color: #fff;
             display: flex;
-            margin: auto;
+            margin: 20px auto; /* Thêm margin 20px ở cả hai chiều để tạo khoảng cách */
+            
         }
 
             .category a {
                 text-decoration: none;
-                background-color:greenyellow;
                 margin: 0 10px;
                 color:black;
                 opacity: 0.5;
             }
+
+        .list-group-item {
+            margin-bottom: 10px; /* Tạo khoảng cách 10px giữa các list-group-item */
+            border: 1px solid #ccc; /* Thêm viền cho mỗi list-group-item */
+            border-radius: 5px; /* Bo tròn góc cho list-group-item */
+            padding: 10px; /* Tăng padding nếu cần thiết */
+        }
+
+            .list-group-item a {
+                text-decoration: none; /* Để loại bỏ underline cho các liên kết trong list-group-item */
+                color: black; /* Màu chữ cho các liên kết */
+            }
+
+        .list-group-horizontal {
+            display: flex; /* Để hiển thị danh sách ngang */
+            justify-content: center; /* Canh giữa các phần tử */
+            gap: 10px; /* Tạo khoảng cách giữa các phần tử */
+        }
+
+        .list-group-item:last-child {
+            margin-bottom: 0; /* Xóa khoảng cách dưới phần tử cuối cùng */
+        }
+
 
         .container {
             padding: 20px;
@@ -90,6 +115,92 @@
             width: 100%;
         }
 
+       
+    </style> *@
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+}
+
+.logo img {
+    height: 64px;
+    width: 128px;
+}
+
+.icons a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.form-control {
+    margin-right: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.btn {
+    padding: 5px 15px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #218838;
+}
+
+        .category {
+            text-align: center;
+            padding: 20px 0;
+            background-color: forestgreen;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+            .category a {
+                text-decoration: none;
+                padding: 10px 20px;
+                background-color: white;
+                color: forestgreen;
+                border: 2px solid white;
+                border-radius: 8px;
+                transition: background-color 0.3s, color 0.3s, border 0.3s;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                font-weight: bold;
+                font-size: 16px;
+                margin-left:30px;
+            }
+
+                .category a:hover {
+                    background-color: black;
+                    color: white;
+                    border: 2px solid black;
+                    opacity: 1;
+                }
+
         .product-card {
             background-color: #fff; /* White background for product cards */
             border-radius: 10px;
@@ -104,7 +215,6 @@
                 height: 150px;
                 object-fit: cover;
                 border-radius: 10px;
-                
             }
 
             .product-card h5 {
@@ -123,18 +233,34 @@
                 font-weight: bold;
                 font-size: 16px;
                 margin-top: 10px;
-                color: #008000; /* Green color for price */
+                color: red; /* Green color for price */
             }
+
+.container {
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
     </style>
 </head>
 <body>
     <div class="header-container">
         <div class="logo">
-            <img src="images/logo.jpg" alt="Logo">
+            <img src="logongang.png" alt="Logo">
         </div>
         <div class="search-bar">
-            <input type="text" class="form-control" placeholder="Search products...">
-            <button class="btn">Tìm kiếm</button>
+            <input type="text" class="form-control" placeholder="Search products..." @bind="searchQuery">
+            <button class="btn" @onclick="SearchProducts">Tìm kiếm</button>
+
         </div>
         <div class="icons">
             <a href="#"><i class="bi bi-cart"></i> Giỏ hàng </a>
@@ -159,3 +285,26 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+@code {
+    private string searchQuery = "";
+
+    private void SearchProducts()
+    {
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            NavigationManager.NavigateTo($"/search/{searchQuery}");
+        }
+        else
+        {
+            ShowErrorMessage("vui lòng nhập tên sản phẩm.");
+        }
+    }
+    private string errorMessage = "";
+
+    // Hàm để hiển thị thông báo
+    private void ShowErrorMessage(string message)
+    {
+        errorMessage = message;
+    }
+}
