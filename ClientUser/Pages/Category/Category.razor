@@ -1,0 +1,64 @@
+﻿@page "/category/{CategoryId:int}"
+
+@if (loading)
+{
+    <div class="mt-auto">
+        <button class="btn btn-primary float-start" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Đang tải...
+        </button>
+    </div>
+}
+else
+{
+    @if (products != null && products.Any())
+    {
+        <h3 class="text-center mb-4">Danh sách sản phẩm</h3>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var product in products)
+            {
+                <div class="col">
+                    <div class="product-card">
+                        <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                        <a href="/products/detail/@product.Id" class="card-title">@product.Name</a>
+                        <p class="card-text">@product.Description</p>
+                        <div class="price">Price: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
+                        <button class="btn btn-danger" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No products found in this category.</p>
+    }
+}
+
+@code {
+    [Parameter]
+    public int CategoryId { get; set; }
+    private bool loading = false;
+    private List<ProductItem>? products;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        loading = true;
+        ServiceModel<ProductList> result = await productService.GetProducts();
+        if (result.Success ==true && result.Data?.Products != null)
+        {
+            products = result.Data.Products.Where(p => p.Category.Id == CategoryId).ToList();
+        }
+        loading = false;
+    }
+
+    private void NavigateToProductDetail(int productId)
+    {
+        NavigationManager.NavigateTo($"/products/detail/{productId}");
+    }
+}
