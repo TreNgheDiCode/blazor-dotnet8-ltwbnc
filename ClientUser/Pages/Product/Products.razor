@@ -1,4 +1,4 @@
-﻿@page "/products"
+﻿@page "/"
 @using BaseLibrary.DTOs
 @inject HttpClient httpClient
 
@@ -25,11 +25,12 @@
                     {
                         <div class="col">
                             <div class="product-card">
-                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
                             <div class="card-title"><a href="/products/detail/@product.Id">@product.Name</a></div>
-                                <p class="card-text">@product.ProductOptions.Sum(opt=>opt.Quantity)</p>
-                            <div class="price">Price: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
-                                <button class="btn btn-danger">Add to Cart</button>
+                            <p class="card-text">@product.Description</p>
+                                <p class="card-text">Số lượng:  @product.ProductOptions.Sum(opt=>opt.Quantity)</p>
+                            <div class="price"  style="color:red">Giá: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
+                            <button class="btn btn-danger" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
                             </div>
                         </div>
                     }
@@ -58,5 +59,9 @@
             products = result.Data;
             loading = false;
         }
+    }
+    private void NavigateToProductDetail(int productId)
+    {
+        NavigationManager.NavigateTo($"/products/detail/{productId}");
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Syncfusion.Blazor;
 using Syncfusion.Blazor.Popups;
 using ClientUserLibrary.Helpers;
+using ClientUserLibrary.Services.CartService;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -21,7 +22,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddTransient<CustomHttpHandler>();
 builder.Services.AddHttpClient("SystemApiClient", client =>
 {
-    client.BaseAddress = new Uri("https://localhost:7016/products");
+    client.BaseAddress = new Uri("https://localhost:7016");
     client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*"); // Thêm header này n?u c?n thi?t
 }).AddHttpMessageHandler<CustomHttpHandler>();
 
@@ -33,6 +34,9 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IProductsService, ProductsService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddScoped<CartService>();
+
 
 // Syncfusion
 builder.Services.Configure<SyncfusionSection>(builder.Configuration.GetSection("Syncfusion"));

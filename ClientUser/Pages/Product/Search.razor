@@ -1,9 +1,8 @@
 ﻿@page "/search/{SearchQuery}"
 @inject HttpClient httpClient
 @inject NavigationManager NavigationManager
+@inject CartService CartService 
 @layout MainLayout
-
-<h3>Product List</h3>
 
 @if (loading)
 {
@@ -12,9 +11,7 @@
 else
 {
 
-
-
-    <h3 class="text-center mb-4">Products</h3>
+    <h2 class="text-center mb-4">Danh Sách Tìm Kiếm</h2>
     @if (products != null && products.Products.Any())
     {
         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -22,11 +19,12 @@ else
             {
                 <div class="col">
                     <div class="product-card">
-                        <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
-                        <h5 class="card-title">@product.Name</h5>
+                        <img  src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                        <h5 class="card-title"><a href="/products/detail/@product.Id">@product.Name</a></h5>
                         <p class="card-text">@product.Description</p>
                         <div class="price">Price: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
-                        <button class="btn btn-danger">Add to Cart</button>
+                        <button class="btn btn-danger" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+
                     </div>
                 </div>
             }
@@ -41,10 +39,9 @@ else
 
 @code {
     [Parameter]
-    public string SearchQuery { get; set; }
-
+    public string SearchQuery { get; set; }=string.Empty;
     private ProductList? products;
-    private List<ProductItem>? filteredProducts;
+    private List<ProductItem>? filteredProducts=new();
     private bool loading = false;
 
     protected override async Task OnInitializedAsync()
@@ -79,7 +76,7 @@ else
             {
                 // Sử dụng Contains thay vì StartsWith để tìm kiếm sản phẩm
                 filteredProducts = products.Products
-                    .Where(p => p.Name.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase))
+                    .Where(p => p.Name?.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ?? false)
                     .ToList();
             }
             else
@@ -88,6 +85,10 @@ else
                 filteredProducts = products.Products.ToList();
             }
         }
+    }
+    private void NavigateToProductDetail(int productId)
+    {
+        NavigationManager.NavigateTo($"/products/detail/{productId}");
     }
 }
 

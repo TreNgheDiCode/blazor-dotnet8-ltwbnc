@@ -1,8 +1,9 @@
 ﻿@page "/products/detail/{ProductId:int}"
 @using ClientUserLibrary.Services.Contracts
+
 @inject IProductsService productService
 
-<h3>ProductDetail</h3>
+<h3>Chi tiết sản phẩm</h3>
 
 <style>
     .product-page {
@@ -150,15 +151,14 @@ else
     {
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/products">Trang Chủ</a></li>
-                <li class="breadcrumb-item"><a href="/products">Sản Phẩm</a></li>
+                <li class="breadcrumb-item"><a href="/">Trang Chủ</a></li>
                 <li class="breadcrumb-item active" aria-current="page">@products.Name</li>
             </ol>
         </nav>
 
         <div class="product-page">
             <div class="product-image">
-                <img src="/logongang.png" class="img-fluid" alt="Product Image">
+                <img src="@products.ProductImages[0].ImageUrl" class="img-fluid" alt="Product Image">
             </div>
             <div class="product-info">
                 <h3 class="product-title">@products.Name</h3>
@@ -170,26 +170,29 @@ else
                 <div class="product-details">Số Lượng: @products.ProductOptions.Sum(i=>i.Quantity) Sản phẩm</div>
                 <div class="product-variations">
                     <label for="size">Chọn kích thước:</label>
-                    <select id="size">
+                    <select id="size" @onchange="OnSizeChanged">
                         @foreach (var option in products.ProductOptions)
                         {
-                            <option value="@option.Size ">@option.Size</option>
+                            <option value="@option.Size">@option.Size</option>
                         }
                     </select>
-                    
+
+               
+
+
                 </div>
                 <div class="product-variations">
                     <label for="size">Chọn màu sắc:</label>
-                    <select id="Color">
+                    <select id="Color" @onchange="OnColorChanged">
                         @foreach (var option in products.ProductOptions)
                         {
-                            <option value="@option.Color ">@option.Color</option>
+                            <option value="@option.Color">@option.Color</option>
                         }
                     </select>
                 </div>
                 
                 <div class="product-actions">
-                    <button class="add-to-cart">Thêm vào Giỏ Hàng</button>
+                    <button class="add-to-cart" @onclick="AddToCart">Thêm vào Giỏ Hàng</button>
                     <button class="wishlist">Yêu Thích</button>
                 </div>
             </div>
@@ -207,7 +210,9 @@ else
     private bool loading = true;
     private ProductItem? products;
     private string message = string.Empty;
-
+    private ProductCartItem product;
+    private string selectedSize=string.Empty;
+    private string selectedColor = string.Empty;
     protected override async Task OnInitializedAsync()
     {
         await LoadProducts();
@@ -218,9 +223,12 @@ else
         try
         {
             var result = await productService.GetProduct(ProductId);
-            if (result.Success==true && result.Data?.Id!=null)
+            if (result.Success == true && result.Data?.Id != null)
             {
                 products = result.Data;
+                // Thiết lập giá trị mặc định cho selectedSize và selectedColor
+                selectedSize = products.ProductOptions.FirstOrDefault()?.Size ?? string.Empty;
+                selectedColor = products.ProductOptions.FirstOrDefault()?.Color ?? string.Empty;
             }
             else
             {
@@ -237,4 +245,38 @@ else
             loading = false;
         }
     }
+
+  
+    private async Task AddToCart()
+    {
+        if (products != null)
+        {
+            product = new ProductCartItem
+                {
+                    Id = products.Id,
+                    Name = products.Name,
+                    Price = products.Price,
+                    Description = products.Description,
+                    Discount = products.Discount,
+                    IsFlashSale = products.IsFlashSale,
+                    Status = products.Status,
+                    color = selectedColor, // Đảm bảo giá trị này được cập nhật đúng
+                    size = selectedSize, // Đảm bảo giá trị này được cập nhật đúng
+                    img = products.ProductImages[0].ImageUrl,
+                    ProductItemOptions = products.ProductOptions.Sum(i => i.Quantity)
+                };
+            await CartService.AddItemToCart(product, 1);
+            await JSRuntime.InvokeVoidAsync("alert", "Sản phẩm đã được thêm vào giỏ hàng thành công!");
+        }
+    }
+    private void OnSizeChanged(ChangeEventArgs e)
+    {
+        selectedSize = e.Value.ToString();
+    }
+
+    private void OnColorChanged(ChangeEventArgs e)
+    {
+        selectedColor = e.Value.ToString();
+    }
+
 }
