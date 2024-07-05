@@ -36,12 +36,12 @@ namespace ClientAdminLibrary.Services.Implementations
                 return new ServiceModel<ProductList>()
                 {
                     Data = new ProductList(),
-                    Message = "Failed to get products",
+                    Message = "Lỗi máy chủ",
                     Success = false
                 };
             }
 
-            return result!;
+            return result;
         }
 
         public Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO product)

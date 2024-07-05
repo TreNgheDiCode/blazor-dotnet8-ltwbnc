@@ -7,7 +7,7 @@ namespace Server.Controllers
 {
     [Route("api/categories")]
     [ApiController]
-    //[Authorize(Roles = "Admin")]
+    [AllowAnonymous]
     public class CategoryController(ICategoryRepo categoryRepo) : ControllerBase
     {
         [HttpGet]
@@ -25,6 +25,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddCategory(CreateCategoryDTO category)
         {
             var result = await categoryRepo.AddCategory(category);
@@ -32,6 +33,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDTO category)
         {
             var result = await categoryRepo.UpdateCategory(id, category);
@@ -39,6 +41,7 @@ namespace Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var result = await categoryRepo.DeleteCategory(id);
