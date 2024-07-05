@@ -1,43 +1,67 @@
-﻿@page "/user/products"
+﻿@page "/"
 @using BaseLibrary.DTOs
 @inject HttpClient httpClient
 
 
-<div class="col">
-    <h3 class="text-center mb-4">Products</h3>
-    @if (products != null && products.Products.Any())
-    {
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var product in products.Products)
-            {
-                <div class="col">
-                    <div class="product-card">
-                        <img src="images/logo.jpg" class="card-img-top img-fluid" alt="Product Image">
-                        <h5 class="card-title">@product.Name</h5>
-                        <p class="card-text">@product.Description</p>
-                        <div class="price">Price: <span>@product.Price</span></div>
-                        <button class="btn btn-danger">Add to Cart</button>
-                    </div>
-                </div>
-            }
+
+
+
+
+    @if (loading == true)
+    {   <div class="mt-auto">
+        <button class="btn btn-primary float-start" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Đang tải...
+        </button>
         </div>
     }
     else
     {
-        <p class="text-center">No products found.</p>
+        <div class="col">
+            @if (products != null && products.Products.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    @foreach (var product in products.Products)
+                    {
+                        <div class="col">
+                            <div class="product-card">
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            <div class="card-title"><a href="/products/detail/@product.Id">@product.Name</a></div>
+                            <p class="card-text">@product.Description</p>
+                                <p class="card-text">Số lượng:  @product.ProductOptions.Sum(opt=>opt.Quantity)</p>
+                            <div class="price"  style="color:red">Giá: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
+                            <button class="btn btn-danger" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-center">No products found.</p>
+            }
+
+        </div>
     }
 
-</div>
+
+
 @code {
     private ProductList? products;
-
+    public bool loading = false;
     protected override async Task OnInitializedAsync()
     {
+        loading = true;
         ServiceModel<ProductList> result = await productService.GetProducts();
-
         if (result.Success == true)
         {
+
             products = result.Data;
+            loading = false;
         }
+    }
+    private void NavigateToProductDetail(int productId)
+    {
+        NavigationManager.NavigateTo($"/products/detail/{productId}");
     }
 }

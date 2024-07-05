@@ -1,10 +1,13 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject CartService CartService
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokyolife - Fashion Store</title>
+    <title>Super Sport - Fashion Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -18,24 +21,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color:black;
-            color:white;
+            background-color: white;
+            color: black;
             padding: 10px 20px;
         }
 
         .logo img {
-            height: 50px;
-        }
-
-        .icons a {
-            margin-left: 10px;
-            text-decoration: none;
-            color: white;
+            height: 64px;
+            width: 128px;
         }
 
         .search-bar {
             display: flex;
             align-items: center;
+            flex-grow: 1;
+            justify-content: center;
         }
 
         .form-control {
@@ -60,25 +60,166 @@
             }
 
         .category {
-            text-align: center;
-            padding: 10px 0;
-            background-color:forestgreen;
+            text-align: left;
+            padding: 15px 0;
+            background: linear-gradient(90deg, #32a852, #2a7d47);
             color: #fff;
             display: flex;
-            margin: auto;
+            justify-content: center;
+            gap: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
-            .category a {
+        .list-group-horizontal {
+            display: flex;
+            gap: 30px;
+        }
+
+        .category-item {
+            position: relative;
+        }
+
+            .category-item a,
+            .category-item .dropdown-toggle {
                 text-decoration: none;
-                background-color:greenyellow;
-                margin: 0 10px;
-                color:black;
-                opacity: 0.5;
+                color: white;
+                padding: 10px 20px;
+                display: block;
+                border-radius: 10px;
+                transition: background-color 0.3s, color 0.3s;
             }
+
+                .category-item a:hover,
+                .category-item .dropdown-toggle:hover {
+                    background-color: greenyellow;
+                    color: black;
+                }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #2a7d47;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            padding: 0;
+            margin: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 200px; /* Adjust this as needed */
+        }
+
+        .dropdown-item {
+            display: block; /* Make sure the entire item is block-level */
+            padding: 0; /* Remove padding from the item itself */
+        }
+
+            .dropdown-item a {
+                color: white;
+                display: block;
+                font-family: Arial, sans-serif;
+                text-decoration: none;
+                padding: 10px 20px; /* Add padding to the anchor */
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .dropdown-item a:hover {
+                    background-color: yellow;
+                    color: black;
+                }
+
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
 
         .container {
             padding: 20px;
+            margin-bottom: 100px; /* Ensure footer doesn't overlap */
         }
+
+        .cart-login {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .cart-icon,
+        .login-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .cart-icon {
+            position: relative;
+        }
+
+            .cart-icon i,
+            .login-link i {
+                font-size: 1.5rem;
+            }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+
+        .product-card {
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+            .product-card img {
+                max-height: 200px;
+                object-fit: cover;
+                border-radius: 10px;
+            }
+
+            .product-card .card-title {
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin-top: 10px;
+                margin-bottom: 5px;
+            }
+
+            .product-card .card-text {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+
+            .product-card .price {
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+
+            .product-card .btn {
+                background-color: #dc3545;
+                border-color: #dc3545;
+                color: white;
+            }
+
+                .product-card .btn:hover {
+                    background-color: #c82333;
+                    border-color: #bd2130;
+                }
 
         footer {
             text-align: center;
@@ -89,61 +230,27 @@
             bottom: 0;
             width: 100%;
         }
-
-        .product-card {
-            background-color: #fff; /* White background for product cards */
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-            .product-card img {
-                width: 100%;
-                height: 150px;
-                object-fit: cover;
-                border-radius: 10px;
-                
-            }
-
-            .product-card h5 {
-                margin-top: 10px;
-                color: #333; /* Dark text color for product titles */
-            }
-
-            .product-card p {
-                margin-top: 5px;
-                font-size: 14px;
-                line-height: 1.5;
-                color: #333; /* Dark text color for descriptions */
-            }
-
-            .product-card .price {
-                font-weight: bold;
-                font-size: 16px;
-                margin-top: 10px;
-                color: #008000; /* Green color for price */
-            }
     </style>
 </head>
 <body>
     <div class="header-container">
         <div class="logo">
-            <img src="images/logo.jpg" alt="Logo">
+            <img src="logongang.png" alt="Logo">
         </div>
         <div class="search-bar">
-            <input type="text" class="form-control" placeholder="Search products...">
-            <button class="btn">Tìm kiếm</button>
+            <input type="text" class="form-control" placeholder="Search products..." @bind="searchQuery">
+            <button class="btn" @onclick="SearchProducts">Tìm kiếm</button>
         </div>
-        <div class="icons">
-            <a href="#"><i class="bi bi-cart"></i> Giỏ hàng </a>
-            <a href="/auth/login"><i class="bi bi-person-circle"></i> Đăng nhập</a>
+        <div class="cart-login">
+            <a class="cart-icon" href="/cart/shoppingcart">
+                <i class="bi bi-cart"><span class="cart-count">@cartItemCount</span></i>
+                Giỏ hàng
+            </a>
+            <a class="login-link" href="/auth/login"><i class="bi bi-person-circle"></i> Đăng nhập</a>
         </div>
     </div>
-
     <div class="category">
-            <NavCategory/>
+        <NavCategory />
     </div>
 
     <div class="container">
@@ -153,9 +260,49 @@
     </div>
 
     <footer>
-        <p>&copy; 2023 Tokyolife. All rights reserved.</p>
+        <p>&copy; 2024 Super Sport. All rights reserved.</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+@code {
+    private string searchQuery = "";
+    private int cartItemCount = 0;
+    private string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        cartItemCount = await CartService.GetCartItemCount();
+        CartService.OnCartChanged += UpdateCartItemCount;
+    }
+
+    private async void UpdateCartItemCount()
+    {
+        cartItemCount = await CartService.GetCartItemCount();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        CartService.OnCartChanged -= UpdateCartItemCount;
+    }
+
+    private void SearchProducts()
+    {
+        if (!string.IsNullOrEmpty(searchQuery))
+        {
+            NavigationManager.NavigateTo($"/search/{searchQuery}");
+        }
+        else
+        {
+            ShowErrorMessage("vui lòng nhập tên sản phẩm.");
+        }
+    }
+
+    private void ShowErrorMessage(string message)
+    {
+        errorMessage = message;
+    }
+}
