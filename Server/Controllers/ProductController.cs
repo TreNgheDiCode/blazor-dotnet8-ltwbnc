@@ -8,7 +8,6 @@ namespace Server.Controllers
     [Route("api/products")]
     [ApiController]
     [AllowAnonymous]
-    //[Authorize(Roles = "Admin")]
     public class ProductController(IProductRepo productRepo) : ControllerBase
     {
         [HttpGet]
@@ -26,6 +25,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddProduct(CreateProductDTO product)
         {
             var result = await productRepo.AddProduct(product);
@@ -34,6 +34,7 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("{id}/images")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddProductImages(int id, List<ProductImageDTO> productImages)
         {
             var result = await productRepo.AddProductImages(id, productImages);
@@ -42,6 +43,7 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route("{id}/options")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddProductOptions(int id, List<ProductOptionDTO> productOptions)
         {
             var result = await productRepo.AddProductOptions(id, productOptions);
@@ -49,6 +51,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProduct(int id, UpdateProductDTO product)
         {
             var result = await productRepo.UpdateProduct(id, product);
@@ -56,6 +59,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{productId}/images/{imageId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProductImage(int productId, int imageId, string imageUrl)
         {
             var result = await productRepo.UpdateProductImage(productId, imageId, imageUrl);
@@ -63,6 +67,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{productId}/options/{optionId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProductOption(int productId, int optionId, ProductOptionDTO productOption)
         {
             var result = await productRepo.UpdateProductOption(productId, optionId, productOption);

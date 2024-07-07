@@ -8,7 +8,7 @@ namespace Server.Controllers
 {
     [Route("api/discounts")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [AllowAnonymous]
     public class DiscountController(IDiscountRepo repo) : ControllerBase
     {
         [HttpGet]
@@ -26,6 +26,7 @@ namespace Server.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> AddDiscount(CreateDiscountDTO discount)
         {
             var result = await repo.AddDiscount(discount);
@@ -33,6 +34,7 @@ namespace Server.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> UpdateDiscount(int id, UpdateDiscountDTO discount)
         {
             var result = await repo.UpdateDiscount(id, discount);
@@ -40,6 +42,7 @@ namespace Server.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles="Admin")]
         public async Task<IActionResult> DeleteDiscount(int id)
         {
             var result = await repo.DeleteDiscount(id);

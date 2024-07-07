@@ -6,36 +6,37 @@ using System.Net.Http.Json;
 
 namespace ClientAdminLibrary.Services.Implementations
 {
-    public class ProductService(GetHttpClient httpClient) : IProductService
+    public class DiscountService(GetHttpClient httpClient) : IDiscountService
     {
-        public const string ProductUrl = "api/products";
+        public const string DiscountUrl = "api/discounts";
 
-        public Task<GeneralResponse> CreateProduct(CreateProductDTO product)
+        public Task<GeneralResponse> CreateDiscount(CreateDiscountDTO discount)
         {
             throw new NotImplementedException();
         }
 
-        public Task<GeneralResponse> DeleteProduct(int id)
+        public Task<GeneralResponse> DeleteDiscount(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ServiceModel<ProductItem>> GetProduct(int id)
+        public Task<ServiceModel<DiscountItem>> GetDiscount(int id)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<ServiceModel<ProductList>> GetProducts()
+        public async Task<ServiceModel<DiscountList>> GetDiscounts()
         {
             var client = httpClient.GetPublicHttpClient();
-            var result = await client.GetFromJsonAsync<ServiceModel<ProductList>>(ProductUrl);
 
-            // Neu result la null thi throw exception
+            var result = await client.GetFromJsonAsync<ServiceModel<DiscountList>>(DiscountUrl);
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
             if (result == null)
             {
-                return new ServiceModel<ProductList>()
+                return new ServiceModel<DiscountList>()
                 {
-                    Data = new ProductList(),
+                    Data = null,
                     Message = "Lỗi máy chủ",
                     Success = false
                 };
@@ -44,7 +45,7 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
-        public Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO product)
+        public Task<GeneralResponse> UpdateDiscount(int id, UpdateDiscountDTO discount)
         {
             throw new NotImplementedException();
         }

@@ -51,7 +51,10 @@ namespace ServerLibrary.Repositories.Implementations
                     WardId = user.WardId,
                     DistrictId = user.DistrictId,
                     ProvinceId = user.ProvinceId
-                }
+                },
+                CreatedAt = DateOnly.FromDateTime(DateTime.Now),
+                IsLocked = false
+
             });
 
             // Kiểm tra, tạo và gán role admin

@@ -2,6 +2,7 @@ using BaseLibrary.Helpers;
 using BaseLibrary.Helpers.Client;
 using Blazored.LocalStorage;
 using ClientAdmin;
+using ClientAdmin.ApplicationStates;
 using ClientAdminLibrary.Helpers;
 using ClientAdminLibrary.Services.Contracts;
 using ClientAdminLibrary.Services.Implementations;
@@ -29,7 +30,12 @@ builder.Services.AddScoped<GetHttpClient>();
 builder.Services.AddScoped<LocalStorageService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<UserState>();
 
 // Syncfusion
 builder.Services.Configure<SyncfusionSection>(builder.Configuration.GetSection("Syncfusion"));

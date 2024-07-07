@@ -1,0 +1,91 @@
+﻿@page "/discount"
+
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+
+<SfGrid DataSource="@Discounts" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
+    <GridTemplates>
+        <ToolbarTemplate>
+            <SfToolbar>
+                <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
+                <ToolbarItems>
+                    <div class="d-flex flex-column">
+                        <div>
+                            <ToolbarItem Text="Thêm"></ToolbarItem>
+                            <ToolbarItem Text="Cập nhật"></ToolbarItem>
+                            <ToolbarItem Text="Xóa"></ToolbarItem>
+                            <ToolbarItem Text="Sửa"></ToolbarItem>
+                            <ToolbarItem Text="Hủy"></ToolbarItem>
+                        </div>
+                        <div>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
+                        </div>
+                    </div>
+                </ToolbarItems>
+            </SfToolbar>
+        </ToolbarTemplate>
+    </GridTemplates>
+    <GridGroupSettings Columns=@GroupOption>
+        <CaptionTemplate>
+            @{
+                var data = (context as CaptionTemplateContext);
+                <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
+            }
+        </CaptionTemplate>
+    </GridGroupSettings>
+    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
+    <GridPageSettings PageSize="5">
+    </GridPageSettings>
+    <GridColumns>
+        <GridColumn Field=@nameof(DiscountItem.Id) HeaderText="Mã giảm giá"></GridColumn>
+        <GridColumn Field=@nameof(DiscountItem.Name) HeaderText="Tên giảm giá"></GridColumn>
+        <GridColumn Field=@nameof(DiscountItem.Value) HeaderText="% Giảm giá"></GridColumn>
+        <GridColumn Field=@nameof(DiscountItem.Quantity) HeaderText="Số lượng"></GridColumn>
+        <GridColumn Field=@nameof(DiscountItem.StartDate) HeaderText="Ngày bắt đầu"></GridColumn>
+        <GridColumn Field=@nameof(DiscountItem.EndDate) HeaderText="Ngày kết thúc"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {
+    // STT, Tên giảm giá, % Giảm giá, Số lượng, Ngày bắt đầu, Ngày kết thúc
+    public List<DiscountItem> Discounts { get; set; } = new();
+    private SfGrid<DiscountItem> Grid;
+    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
+    private string[] GroupOption = (new string[] { "Id" });
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ServiceModel<DiscountList> result = await discountService.GetDiscounts();
+
+            if (result.Success == true && result.Data is not null)
+            {
+                Discounts = result.Data.Discounts;
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách giảm giá");
+        }
+    }
+
+    public async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        if (args.Item.Text == "Thu gọn")
+        {
+            await this.Grid.CollapseAllGroupAsync();
+        }
+        if (args.Item.Text == "Mở rộng")
+        {
+            await this.Grid.ExpandAllGroupAsync();
+            await this.Grid.CloseEditAsync();
+        }
+    }
+
+    private async Task DisplayDialog(string content, string title)
+    {
+        await DialogService.AlertAsync(content, title);
+    }
+}

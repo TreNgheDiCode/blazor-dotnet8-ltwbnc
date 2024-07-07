@@ -1,45 +1,155 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">
-            Xin chào,
-            <AuthorizeView>
-                <Authorized>@context.User.Identity!.Name</Authorized>
-                <NotAuthorized>người dùng</NotAuthorized>
-            </AuthorizeView>
-        </a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <SfSidebar @ref="sidebar" ShowBackdrop="true" Width="256px" @bind-IsOpen="SidebarToggle" Target="@Target" MediaQuery="(min-width: 600px)">
+            <ChildContent>
+                <img src="images/logongang.png" alt="Logo" class="img-fluid">
+                <div class="text-center fs-5 mb-4">Bảng điều khiển</div>
+                <a href="/" class="text-decoration-none" style="color: #212529">
+                    <div class="home-header" role="button">
+                        <div class="home-header-icon">
+                            <i class="bi bi-house-door-fill e-icons"></i>
+                        </div>
+                        <div class="home-header-content">
+                            Trang chủ
+                        </div>
+                    </div>
+                </a>
+                <SfAccordion>
+                    <AccordionItems>
+                        <AccordionItem Header="Người dùng" IconCss="bi bi-person-fill" Expanded="false">
+                            <ContentTemplate>
+                                <ul class="list-unstyled ps-3 mb-0">
+                                    <li class="mb-2">
+                                        <NavLink href="/user" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-people"></i>
+                                            <span>Danh sách người dùng</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink href="/user/create" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-person-add"></i>
+                                            <span>Thêm người dùng</span>
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            </ContentTemplate>
+                        </AccordionItem>
+                        <AccordionItem Header="Danh mục" IconCss="bi bi-bookmark-fill" Expanded="false">
+                            <ContentTemplate>
+                                <ul class="list-unstyled ps-3 mb-0">
+                                    <li class="mb-2">
+                                        <NavLink href="/category" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-bookmark-star"></i>
+                                            <span>Danh sách danh mục</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink href="/category/create" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-bookmark-plus"></i>
+                                            <span>Thêm danh mục</span>
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            </ContentTemplate>
+                        </AccordionItem>
+                        <AccordionItem Header="Sản phẩm" IconCss="bi bi-box-seam-fill" Expanded="false">
+                            <ContentTemplate>
+                                <ul class="list-unstyled ps-3 mb-0">
+                                    <li class="mb-2">
+                                        <NavLink href="/product" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-box"></i>
+                                            <span>Danh sách sản phẩm</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink href="/product/create" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-box-arrow-in-down"></i>
+                                            <span>Thêm sản phẩm</span>
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            </ContentTemplate>
+                        </AccordionItem>
+                        <AccordionItem Header="Mã giảm giá" IconCss="bi bi-tag-fill" Expanded="false">
+                            <ContentTemplate>
+                                <ul class="list-unstyled ps-3 mb-0">
+                                    <li class="mb-2">
+                                        <NavLink href="/discount" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-tags"></i>
+                                            <span>Danh sách mã giảm giá</span>
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink href="/discount/create" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-plus-circle-dotted"></i>
+                                            <span>Thêm mã giảm giá</span>
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            </ContentTemplate>
+                        </AccordionItem>
+                        <AccordionItem Header="Đơn hàng" IconCss="bi bi-coin" Expanded="false">
+                            <ContentTemplate>
+                                <ul class="list-unstyled ps-3 mb-0">
+                                    <li>
+                                        <NavLink href="/order" Match="NavLinkMatch.All" class="text-decoration-none">
+                                            <i class="bi bi-cash-stack"></i>
+                                            <span>Danh sách đơn hàng</span>
+                                        </NavLink>
+                                    </li>
+                                </ul>
+                            </ContentTemplate>
+                        </AccordionItem>
+                    </AccordionItems>
+                </SfAccordion>
+            </ChildContent>
+        </SfSidebar>
+    </Authorized>
+</AuthorizeView>
 
 @code {
-    private bool collapseNavMenu = true;
+    SfSidebar? sidebar;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    public string Target = ".page";
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+    [Parameter]
+    public bool SidebarToggle { get; set; }
 }
+
+<style>
+    .home-header {
+        border-radius: 0;
+        line-height: 22px;
+        min-height: 38px;
+        overflow: hidden;
+        padding: 10px 16px;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        border-color: #dee2e6;
+        border-style: solid;
+        border-width: 0 0 1px 0;
+        font-size: 12px;
+    }
+
+        .home-header .home-header-icon {
+            display: inline-block;
+        }
+
+            .home-header .home-header-icon i {
+                margin-right: 0;
+            }
+
+        .home-header .home-header-content {
+            display: inline-block;
+        }
+
+            /* Hover styles */
+            .home-header:hover, .home-header .home-header-icon i:hover, .home-header .home-header-content:hover,
+            ul.list-unstyled li a:hover {
+                color: #0c63e4 !important; /* Ensures the hover color overrides other styles */
+            }
+</style>

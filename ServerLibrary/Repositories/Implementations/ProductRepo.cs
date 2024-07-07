@@ -222,16 +222,13 @@ namespace ServerLibrary.Repositories.Implementations
                 {
                     Id = p.Id,
                     Name = p.Name,
+                    CoverUrl = p.ProductImages.Select(pi => pi.Url).FirstOrDefault() ?? string.Empty,
                     Description = p.Description,
                     Price = p.Price,
                     Discount = p.Discount,
                     IsFlashSale = p.IsFlashSale,
                     Status = p.Status,
-                    Category = new CategoryItem
-                    {
-                        Id = p.Category!.Id,
-                        Name = p.Category.Name
-                    },
+                    CategoryName = p.Category!.Name,
                     ProductImages = p.ProductImages.Select(pi => new ProductItemImage
                     {
                         Id = pi.Id,
@@ -310,16 +307,13 @@ namespace ServerLibrary.Repositories.Implementations
                 {
                     Id = p.Id,
                     Name = p.Name,
+                    CoverUrl = p.ProductImages.Select(pi => pi.Url).FirstOrDefault() ?? string.Empty,
                     Description = p.Description,
                     Price = p.Price,
                     Discount = p.Discount,
                     IsFlashSale = p.IsFlashSale,
                     Status = p.Status,
-                    Category = new CategoryItem
-                    {
-                        Id = p.Category!.Id,
-                        Name = p.Category.Name
-                    },
+                    CategoryName = p.Category!.Name,
                     ProductImages = p.ProductImages.Select(pi => new ProductItemImage
                     {
                         Id = pi.Id,

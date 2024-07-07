@@ -1,0 +1,90 @@
+﻿@page "/order"
+
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Navigations
+
+<SfGrid DataSource="@Orders" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
+    <GridTemplates>
+        <ToolbarTemplate>
+            <SfToolbar>
+                <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
+                <ToolbarItems>
+                    <div class="d-flex flex-column">
+                        <div>
+                            <ToolbarItem Text="Thêm"></ToolbarItem>
+                            <ToolbarItem Text="Cập nhật"></ToolbarItem>
+                            <ToolbarItem Text="Xóa"></ToolbarItem>
+                            <ToolbarItem Text="Sửa"></ToolbarItem>
+                            <ToolbarItem Text="Hủy"></ToolbarItem>
+                        </div>
+                        <div>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
+                        </div>
+                    </div>
+                </ToolbarItems>
+            </SfToolbar>
+        </ToolbarTemplate>
+    </GridTemplates>
+    <GridGroupSettings Columns=@GroupOption>
+        <CaptionTemplate>
+            @{
+                var data = (context as CaptionTemplateContext);
+                <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
+            }
+        </CaptionTemplate>
+    </GridGroupSettings>
+    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
+    <GridPageSettings PageSize="5">
+    </GridPageSettings>
+    <GridColumns>
+        <GridColumn Field=@nameof(OrderItem.Id) HeaderText="Mã đơn hàng"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.User.Fullname) HeaderText="Người đặt"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.OrderDate) HeaderText="Ngày tạo"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.PaymentMethod) HeaderText="Phương thức thanh toán"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.Status) HeaderText="Trạng thái"></GridColumn>
+    </GridColumns>
+</SfGrid>
+
+@code {
+    // Mã đơn hàng, Phương thức thanh toán, Trạng thái, Ngày tạo, Người đặt, Thao tác
+    public List<OrderItem> Orders { get; set; } = new();
+    private SfGrid<OrderItem>? Grid;
+    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
+    private string[] GroupOption = (new string[] { "Id" });
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ServiceModel<OrderList> result = await orderService.GetOrders();
+
+            if (result.Success == true && result.Data is not null)
+            {
+                Orders = result.Data.Orders;
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách đơn hàng");
+        }
+    }
+
+    public async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        if (args.Item.Text == "Thu gọn")
+        {
+            await this.Grid.CollapseAllGroupAsync();
+        }
+        if (args.Item.Text == "Mở rộng")
+        {
+            await this.Grid.ExpandAllGroupAsync();
+            await this.Grid.CloseEditAsync();
+        }
+    }
+
+    public async Task DisplayDialog(string title, string content)
+    {
+        await DialogService.AlertAsync(content, title);
+    }
+}

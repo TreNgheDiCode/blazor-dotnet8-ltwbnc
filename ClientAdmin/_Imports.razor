@@ -1,5 +1,6 @@
 ﻿@using System.Net.Http
 @using System.Net.Http.Json
+@using ClientAdmin.ApplicationStates
 @using ClientAdminLibrary.Services.Contracts
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
@@ -18,5 +19,11 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IUserAccountService accountService
 @inject IProductService productService
+@inject ICategoryService categoryService
+@inject IUserService userService
+@inject IDiscountService discountService
+@inject IOrderService orderService
 @inject NavigationManager NavManager
+@inject UserState userState
+
 @inject SfDialogService DialogService

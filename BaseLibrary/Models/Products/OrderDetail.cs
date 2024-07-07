@@ -6,14 +6,14 @@ namespace BaseLibrary.Models.Products
     {
         public int Id { get; set; }
         public int Quantity { get; set; }
-        public double Price { get; set; }
-        public double Discount { get; set; }
-        public double Total { get; set; }
-
+        // Quan hệ đến bảng Giảm giá: Một chi tiết đơn hàng chỉ có một giảm giá
+        [ForeignKey("Discount")]
+        public int? DiscountId { get; set; }
+        public Discount? Discount { get; set; }
         // Quan hệ đến bảng Sản phẩm: Một chi tiết đơn hàng chỉ thuộc về một sản phẩm
         [ForeignKey("Product")]
         public int ProductId { get; set; }
-        public Product? Product { get; set; }
+        public Product? Product { get; set; } = null!;
 
         // Quan hệ đến bảng Đơn hàng: Một chi tiết đơn hàng chỉ thuộc về một đơn hàng
         public string OrderId { get; set; } = null!;
