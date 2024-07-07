@@ -1,30 +1,89 @@
 ﻿@using BaseLibrary.DTOs.Auth
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.SplitButtons
 @inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<AuthorizeView>
+    <Authorized>
+        <div class="d-flex flex-column vh-100">
+            <div id="head" class="flex-shrink-0">
+                <SfToolbar>
+                    <ToolbarItems>
+                        <ToolbarItem PrefixIcon="bi-list" TooltipText="Menu" OnClick="Toggle"></ToolbarItem>
+                        <ToolbarItem PrefixIcon="bi-search" Align="@ItemAlign.Right" TooltipText="Tìm kiếm" Click="OpenSearchDialog"></ToolbarItem>
+                        <ToolbarItem PrefixIcon="bi-bell" TooltipText="Thông báo" Align="@ItemAlign.Right">
+                        </ToolbarItem>
+                        <ToolbarItem PrefixIcon="bi-gear" TooltipText="Cài đặt" Align="@ItemAlign.Right">
+                        </ToolbarItem>
+                        <ToolbarItem Type="ItemType.Input" Align="@ItemAlign.Right">
+                            <Template>
+                                <SfDropDownButton IconCss="bi bi-person-lines-fill" Content="@Content">
+                                    <DropDownButtonEvents ItemSelected="ItemSelected">
+                                    </DropDownButtonEvents>
+                                    <DropDownMenuItems>
+                                        <DropDownMenuItem Text="Đăng xuất" IconCss="bi bi-box-arrow-right">
+                                        </DropDownMenuItem>
+                                    </DropDownMenuItems>
+                                </SfDropDownButton>
+                            </Template>
+                        </ToolbarItem>
+                    </ToolbarItems>
+                </SfToolbar>
+            </div>
 
-    <main>
-        <div class="top-row px-4">
-            <AuthorizeView>
-                <Authorized>
-                    <a class="btn btn-none text-danger" @onclick="LogoutClicked">Đăng xuất</a>
-                </Authorized>
-                <NotAuthorized>
-                    <a class="btn btn-none" href="auth/login">Đăng nhập</a>
-                </NotAuthorized>
-            </AuthorizeView>
+            <NavMenu SidebarToggle="@SidebarToggle" />
+
+            <main class="page flex-grow-1 overflow-auto">
+                <article class="content px-4 w-100">
+                    @Body
+                </article>
+            </main>
+
+            <div id="footer" class="text-center text-white bg-primary py-2 flex-shrink-0" style="font-size:1.2rem;">
+                <span class="float-end me-5 fs-6">Copyright &copy; 2024 CIGP Corp. All Rights Reserved</span>
+            </div>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+    </Authorized>
+</AuthorizeView>
+<Syncfusion.Blazor.Popups.SfDialogProvider />
 
 @code {
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private async Task CheckUserAuthentication()
+    {
+        var user = (await AuthenticationState).User;
+        bool isUserAuthenticated = user.Identity!.IsAuthenticated;
+        if (!isUserAuthenticated)
+        {
+            NavManager.NavigateTo("/auth/login");
+        }
+    }
+
+    public bool SidebarToggle { get; set; } = true;
+
+    public string Content = "Xin chào, ";
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CheckUserAuthentication();
+        var user = (await AuthenticationState).User;
+
+        Content += user.Identity!.Name;
+    }
+
+    public void Toggle()
+    {
+        SidebarToggle = !SidebarToggle;
+    }
+
+    private bool IsDialogVisible { get; set; } = false;
+
+    private void OpenSearchDialog()
+    {
+        IsDialogVisible = true;
+    }
+
     async Task LogoutClicked()
     {
         var logoutModel = new UserSession();
@@ -32,4 +91,25 @@
         await customAuthStateProvider.UpdateAuthenticationState(logoutModel);
         NavManager.NavigateTo("/", forceLoad: true);
     }
+
+    private async void ItemSelected(MenuEventArgs args)
+    {
+        if (args.Item.Text == "Đăng xuất")
+        {
+            await LogoutClicked();
+        }
+    }
 }
+
+<style>
+    .e-toolbar .e-toolbar-items, .footer, .e-toolbar .e-toolbar-item .e-tbar-btn.e-btn {
+        background-color: #007bff;
+        color: white;
+        font-size: 16px;
+    }
+
+    .e-dropdown-btn {
+        background-color: #007bff;
+        color: white;
+    }
+</style>

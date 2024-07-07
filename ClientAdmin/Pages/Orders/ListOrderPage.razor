@@ -1,10 +1,9 @@
-﻿@page "/user"
+﻿@page "/order"
 
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
 
-
-<SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
+<SfGrid DataSource="@Orders" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
     <GridTemplates>
         <ToolbarTemplate>
             <SfToolbar>
@@ -12,7 +11,6 @@
                 <ToolbarItems>
                     <div class="d-flex flex-column">
                         <div>
-
                             <ToolbarItem Text="Thêm"></ToolbarItem>
                             <ToolbarItem Text="Cập nhật"></ToolbarItem>
                             <ToolbarItem Text="Xóa"></ToolbarItem>
@@ -40,51 +38,18 @@
     <GridPageSettings PageSize="5">
     </GridPageSettings>
     <GridColumns>
-        <GridColumn Field=@nameof(UserItem.Id) HeaderText="Mã người dùng"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.Fullname) HeaderText="Tên người dùng"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.Email) HeaderText="Email"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.CreatedAt) HeaderText="Ngày tạo" Format="dd/MM/yyyy" Type="ColumnType.DateOnly"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.IsLocked) HeaderText="Khóa">
-            <Template>
-                @{
-                    var user = (context as UserItem);
-                    <div>
-                        @if (user!.IsLocked == true)
-                        {
-                            <span class="badge bg-danger">Đã khóa</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">Đang kích hoạt</span>
-                        }
-                    </div>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn Field=@nameof(UserItem.Role) HeaderText="Vai trò">
-            <Template>
-                @{
-                    var user = (context as UserItem);
-                    <div>
-                        @if (user!.Role == "Admin")
-                        {
-                            <span class="badge bg-danger">Quản trị viên</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">Người dùng</span>
-                        }
-                    </div>
-                }
-            </Template>
-        </GridColumn>
+        <GridColumn Field=@nameof(OrderItem.Id) HeaderText="Mã đơn hàng"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.User.Fullname) HeaderText="Người đặt"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.OrderDate) HeaderText="Ngày tạo"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.PaymentMethod) HeaderText="Phương thức thanh toán"></GridColumn>
+        <GridColumn Field=@nameof(OrderItem.Status) HeaderText="Trạng thái"></GridColumn>
     </GridColumns>
 </SfGrid>
 
 @code {
-    // STT, Tên, Email, Ngày tạo, Khóa, Ủy quyền, Thao tác
-    public List<UserItem> Users { get; set; } = new();
-    private SfGrid<UserItem> Grid;
+    // Mã đơn hàng, Phương thức thanh toán, Trạng thái, Ngày tạo, Người đặt, Thao tác
+    public List<OrderItem> Orders { get; set; } = new();
+    private SfGrid<OrderItem>? Grid;
     private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
     private string[] GroupOption = (new string[] { "Id" });
 
@@ -92,16 +57,16 @@
     {
         try
         {
-            ServiceModel<UserList> result = await userService.GetUsers();
+            ServiceModel<OrderList> result = await orderService.GetOrders();
 
             if (result.Success == true && result.Data is not null)
             {
-                Users = result.Data.Users;
+                Orders = result.Data.Orders;
             }
         }
         catch (Exception ex)
         {
-            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách người dùng");
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách đơn hàng");
         }
     }
 
@@ -118,7 +83,7 @@
         }
     }
 
-    private async Task DisplayDialog(string content, string title)
+    public async Task DisplayDialog(string title, string content)
     {
         await DialogService.AlertAsync(content, title);
     }

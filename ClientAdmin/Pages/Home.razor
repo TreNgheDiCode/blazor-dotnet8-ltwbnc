@@ -1,7 +1,20 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+    protected async override Task OnInitializedAsync()
+    {
+        // Get the current user
+        var user = (await AuthenticationState).User;
+        if (user.Identity!.IsAuthenticated)
+        {
+            // User is authenticated
+            NavManager.NavigateTo("/");
+        }
+        else
+        {
+            NavManager.NavigateTo("/auth/login");
+        }
+    }
+}

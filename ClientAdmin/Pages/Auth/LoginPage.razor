@@ -57,17 +57,24 @@
     async Task HandleLogin()
     {
         ShowLoadingButton = true;
-        var result = await accountService.SignInAsync(User);
-        if (result.Flag)
+        try
         {
-            await DisplayDialog(result.Message, "Đăng nhập thành công");
-            var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
-            await customAuthStateProvider.UpdateAuthenticationState(new UserSession() { Token = result.Token, RefreshToken = result.RefreshToken });
-            NavManager.NavigateTo("/", forceLoad: true);
+            var result = await accountService.SignInAsync(User);
+            if (result.Flag)
+            {
+                await DisplayDialog(result.Message, "Đăng nhập thành công");
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(new UserSession() { Token = result.Token, RefreshToken = result.RefreshToken });
+                NavManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                await DisplayDialog(result.Message, "Đăng nhập thất bại");
+            }
         }
-        else
+        catch
         {
-            await DisplayDialog(result.Message, "Đăng nhập thất bại");
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi đăng nhập");
         }
 
         ShowLoadingButton = false;

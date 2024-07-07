@@ -1,10 +1,9 @@
-﻿@page "/user"
+﻿@page "/product"
 
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
 
-
-<SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
+<SfGrid DataSource="@Products" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
     <GridTemplates>
         <ToolbarTemplate>
             <SfToolbar>
@@ -12,7 +11,6 @@
                 <ToolbarItems>
                     <div class="d-flex flex-column">
                         <div>
-
                             <ToolbarItem Text="Thêm"></ToolbarItem>
                             <ToolbarItem Text="Cập nhật"></ToolbarItem>
                             <ToolbarItem Text="Xóa"></ToolbarItem>
@@ -40,51 +38,20 @@
     <GridPageSettings PageSize="5">
     </GridPageSettings>
     <GridColumns>
-        <GridColumn Field=@nameof(UserItem.Id) HeaderText="Mã người dùng"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.Fullname) HeaderText="Tên người dùng"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.Email) HeaderText="Email"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.CreatedAt) HeaderText="Ngày tạo" Format="dd/MM/yyyy" Type="ColumnType.DateOnly"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.IsLocked) HeaderText="Khóa">
-            <Template>
-                @{
-                    var user = (context as UserItem);
-                    <div>
-                        @if (user!.IsLocked == true)
-                        {
-                            <span class="badge bg-danger">Đã khóa</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">Đang kích hoạt</span>
-                        }
-                    </div>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn Field=@nameof(UserItem.Role) HeaderText="Vai trò">
-            <Template>
-                @{
-                    var user = (context as UserItem);
-                    <div>
-                        @if (user!.Role == "Admin")
-                        {
-                            <span class="badge bg-danger">Quản trị viên</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-success">Người dùng</span>
-                        }
-                    </div>
-                }
-            </Template>
-        </GridColumn>
+        <GridColumn Field=@nameof(ProductItem.Id) HeaderText="Mã sản phẩm"></GridColumn>
+        <GridColumn Field=@nameof(ProductItem.CoverUrl) HeaderText="Ảnh"></GridColumn>
+        <GridColumn Field=@nameof(ProductItem.Name) HeaderText="Tên sản phẩm"></GridColumn>
+        <GridColumn Field=@nameof(ProductItem.CategoryName) HeaderText="Loại sản phẩm"></GridColumn>
+        <GridColumn Field=@nameof(ProductItem.Price) HeaderText="Giá gốc"></GridColumn>
+        <GridColumn Field=@nameof(ProductItem.Discount) HeaderText="Giảm giá"></GridColumn>
+        <GridColumn Field=@nameof(ProductItem.IsFlashSale) HeaderText="Flash Sale"></GridColumn>
     </GridColumns>
 </SfGrid>
 
 @code {
-    // STT, Tên, Email, Ngày tạo, Khóa, Ủy quyền, Thao tác
-    public List<UserItem> Users { get; set; } = new();
-    private SfGrid<UserItem> Grid;
+    // STT, Ảnh, Tên sản phẩm, Loại sản phẩm, Giá gốc, Giảm giá, Flash Sale, Thao tác
+    public List<ProductItem> Products { get; set; } = new();
+    private SfGrid<ProductItem> Grid;
     private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
     private string[] GroupOption = (new string[] { "Id" });
 
@@ -92,16 +59,16 @@
     {
         try
         {
-            ServiceModel<UserList> result = await userService.GetUsers();
+            ServiceModel<ProductList> result = await productService.GetProducts();
 
             if (result.Success == true && result.Data is not null)
             {
-                Users = result.Data.Users;
+                Products = result.Data.Products;
             }
         }
         catch (Exception ex)
         {
-            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách người dùng");
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách sản phẩm");
         }
     }
 

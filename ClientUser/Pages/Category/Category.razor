@@ -37,7 +37,7 @@ else
 
 @code {
     [Parameter]
-    public int CategoryId { get; set; }
+    public string CategoryName { get; set; }
     private bool loading = false;
     private List<ProductItem>? products;
 
@@ -50,9 +50,9 @@ else
     {
         loading = true;
         ServiceModel<ProductList> result = await productService.GetProducts();
-        if (result.Success ==true && result.Data?.Products != null)
+        if (result.Success == true && result.Data?.Products != null)
         {
-            products = result.Data.Products.Where(p => p.Category.Id == CategoryId).ToList();
+            products = result.Data.Products.Where(p => p.CategoryName == CategoryName).ToList();
         }
         loading = false;
     }

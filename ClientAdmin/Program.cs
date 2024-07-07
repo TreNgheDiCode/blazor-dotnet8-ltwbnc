@@ -32,6 +32,9 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IDiscountService, DiscountService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<UserState>();
 
 // Syncfusion

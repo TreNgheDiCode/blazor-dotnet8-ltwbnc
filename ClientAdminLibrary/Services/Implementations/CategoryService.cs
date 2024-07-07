@@ -1,5 +1,4 @@
 ﻿using BaseLibrary.DTOs;
-using BaseLibrary.DTOs.Auth;
 using BaseLibrary.Helpers.Client;
 using BaseLibrary.Responses;
 using ClientAdminLibrary.Services.Contracts;
@@ -7,34 +6,30 @@ using System.Net.Http.Json;
 
 namespace ClientAdminLibrary.Services.Implementations
 {
-    public class UserService(GetHttpClient httpClient) : IUserService
+    public class CategoryService(GetHttpClient httpClient) : ICategoryService
     {
-        public const string ProductUrl = "api/users";
+        public const string CategoryUrl = "api/categories";
 
-        public Task<GeneralResponse> CreateUser(Register user)
+        public Task<GeneralResponse> CreateCategory(CreateCategoryDTO category)
         {
             throw new NotImplementedException();
         }
 
-        public Task<GeneralResponse> DeleteUser(int id)
+        public Task<GeneralResponse> DeleteCategory(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ServiceModel<UserItem>> GetUser(int id)
+        public async Task<ServiceModel<CategoryList>> GetCategories()
         {
-            throw new NotImplementedException();
-        }
+            var client = httpClient.GetPublicHttpClient();
 
-        public async Task<ServiceModel<UserList>> GetUsers()
-        {
-            var client = await httpClient.GetPrivateHttpClient();
-            var result = await client.GetFromJsonAsync<ServiceModel<UserList>>(ProductUrl);
+            var result = await client.GetFromJsonAsync<ServiceModel<CategoryList>>(CategoryUrl);
 
             // Nếu không có kết quả thì trả về thông báo lỗi
             if (result == null)
             {
-                return new ServiceModel<UserList>()
+                return new ServiceModel<CategoryList>()
                 {
                     Data = null,
                     Message = "Lỗi máy chủ",
@@ -45,7 +40,12 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
-        public Task<GeneralResponse> UpdateUser(int id, UpdateUserDTO user)
+        public Task<ServiceModel<CategoryItem>> GetCategory(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category)
         {
             throw new NotImplementedException();
         }

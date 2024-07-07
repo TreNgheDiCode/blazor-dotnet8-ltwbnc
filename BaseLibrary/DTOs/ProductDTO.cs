@@ -15,13 +15,14 @@ namespace BaseLibrary.DTOs
     public record ProductItem
     {
         public int Id { get; set; } // ID sản phẩm
+        public string? CoverUrl { get; set; } // Đường dẫn ảnh bìa
         public string? Name { get; set; } // Tên sản phẩm
         public string? Description { get; set; } // Mô tả sản phẩm
         public double? Price { get; set; } // Giá gốc
         public int? Discount { get; set; } // % Giảm giá
         public bool? IsFlashSale { get; set; } // Có đang giảm giá
         public ProductStatus Status { get; set; } // Trạng thái sản phẩm
-        public CategoryItem? Category { get; set; } // Danh mục
+        public string? CategoryName { get; set; } // Danh mục
         public List<ProductItemImage>? ProductImages { get; set; } // Danh sách hình ảnh sản phẩm
         public List<ProductItemOption>? ProductOptions { get; set; } // Danh sách tùy chọn sản phẩm
         public List<ProductItemReview>? ProductReviews { get; set; } // Danh sách đánh giá
@@ -66,7 +67,7 @@ namespace BaseLibrary.DTOs
         [Required(ErrorMessage = "Giá sản phẩm không được để trống")]
         [DataType(DataType.Currency)]
         [Range(80000, double.MaxValue, ErrorMessage = "Giá sản phẩm phải ít nhất 80000")]
-        public double? Price { get; set; } // Giá gốc
+        public double Price { get; set; } // Giá gốc
         [Range(0, 100, ErrorMessage = "Giảm giá phải từ 0 đến 100 (%)")]
         public int? Discount { get; set; } // % Giảm giá
         public bool? IsFlashSale { get; set; } // Có đang giảm giá
@@ -97,7 +98,7 @@ namespace BaseLibrary.DTOs
     {
         public string? Name { get; set; } // Tên sản phẩm
         public string? Description { get; set; } // Mô tả sản phẩm
-        public double? Price { get; set; } // Giá gốc
+        public double Price { get; set; } // Giá gốc
         public int? Discount { get; set; } // % Giảm giá
         public bool? IsFlashSale { get; set; } // Có đang giảm giá
         public ProductStatus Status { get; set; } // Trạng thái sản phẩm
