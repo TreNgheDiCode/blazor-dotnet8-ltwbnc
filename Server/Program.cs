@@ -30,6 +30,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<ICategoryRepo, CategoryRepo>();
 builder.Services.AddScoped<IProductRepo,ProductRepo >();
 builder.Services.AddScoped<IUserRepo, UserRepo>();
+builder.Services.AddScoped<IDiscountRepo, DiscountRepo>();
+builder.Services.AddScoped<IOrderRepo, OrderRepo>();
+builder.Services.AddScoped<IAddressRepo, AddressRepo>();
 
 builder.Services.Configure<JwtSection>(builder.Configuration.GetSection("JwtSection"));
 var jwtSection = builder.Configuration.GetSection(nameof(JwtSection)).Get<JwtSection>();
@@ -63,7 +66,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorWasm",
         builder => builder
-        .WithOrigins("https://localhost:7214", "http://localhost:5118")
+        .WithOrigins("https://localhost:7214", "https://localhost:7216", "http://localhost:5118", "http://localhost:5500")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials());

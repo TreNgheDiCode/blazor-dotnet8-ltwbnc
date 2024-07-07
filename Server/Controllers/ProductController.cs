@@ -1,53 +1,85 @@
 ﻿using BaseLibrary.DTOs;
-using BaseLibrary.Enums;
-using BaseLibrary.Models.Products;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServerLibrary.Repositories.Interfaces;
 
 namespace Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
-    public class ProductController : ControllerBase
+    [AllowAnonymous]
+    public class ProductController(IProductRepo productRepo) : ControllerBase
     {
-        private readonly IProductRepo productRepo;
-        public ProductController(IProductRepo productRepo)
+        [HttpGet]
+        public async Task<IActionResult> GetProducts(int? page, int? pageSize)
         {
-            this.productRepo = productRepo;
-        }
-
-        [HttpGet("Get-Product/{Id:int}")]
-
-        public async Task<ActionResult<ServiceModel<ProductsDTO>>> GetProduct(int Id)
-        {
-            var result = await productRepo.GetProductById(Id);
+            var result = await productRepo.GetProducts(page, pageSize);
             return Ok(result);
         }
 
-        [HttpPost("Add-Product")]
-        public async Task<ActionResult<ProductsDTO>> AddProduct(ProductsDTO product)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProduct(int id)
         {
-            return Ok(await productRepo.AddProduct(product));
-        }
-        [HttpGet("Get-Products")]
-        public async Task<ActionResult<ServiceModel<ProductsDTO>>> GetProducts()
-        {
-            var result = await productRepo.GetProducts();
+            var result = await productRepo.GetProductById(id);
             return Ok(result);
         }
 
-        [HttpDelete("Delete-Product/{Id:int}")]
-        public async Task<ActionResult<ServiceModel<ProductsDTO>>> DeleteProduct(int id)
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddProduct(CreateProductDTO product)
         {
-            return Ok(await productRepo.DeleteProduct(id));
+            var result = await productRepo.AddProduct(product);
+            return Ok(result);
         }
-        //
-        //[HttpPost("Update-Product/{Id:int}")]
-        //public async Task<ActionResult<ServiceModel<ProductsDTO>>> UpdateProduct(int id, ProductsDTO product)
-        //{
-        //    return Ok(await productRepo.UpdateProduct(id,product));
-        //}
+
+        [HttpPost]
+        [Route("{id}/images")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddProductImages(int id, List<ProductImageDTO> productImages)
+        {
+            var result = await productRepo.AddProductImages(id, productImages);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Route("{id}/options")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddProductOptions(int id, List<ProductOptionDTO> productOptions)
+        {
+            var result = await productRepo.AddProductOptions(id, productOptions);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProduct(int id, UpdateProductDTO product)
+        {
+            var result = await productRepo.UpdateProduct(id, product);
+            return Ok(result);
+        }
+
+        [HttpPut("{productId}/images/{imageId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProductImage(int productId, int imageId, string imageUrl)
+        {
+            var result = await productRepo.UpdateProductImage(productId, imageId, imageUrl);
+            return Ok(result);
+        }
+
+        [HttpPut("{productId}/options/{optionId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProductOption(int productId, int optionId, ProductOptionDTO productOption)
+        {
+            var result = await productRepo.UpdateProductOption(productId, optionId, productOption);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var result = await productRepo.DeleteProduct(id);
+            return Ok(result);
+        }
     }
 }
     

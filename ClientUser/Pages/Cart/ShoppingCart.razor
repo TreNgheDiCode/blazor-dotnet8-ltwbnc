@@ -1,0 +1,190 @@
+﻿@page "/cart/shoppingcart"
+@using static BaseLibrary.Models.Cart
+@inject CartService CartService
+@inject NavigationManager NavigationManager
+
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #121212;
+        color: #ffffff;
+    }
+
+    .cart-container {
+        margin: 20px;
+    }
+
+    .cart-header, .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .cart-header {
+        font-weight: bold;
+        background-color: #333;
+    }
+
+        .cart-header div, .cart-item div {
+            flex: 1;
+            text-align: center;
+        }
+
+        .cart-header .product-image, .cart-item .product-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .cart-header .product-details, .cart-item .product-details {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header .product-name, .cart-item .product-name,
+        .cart-header .product-price, .cart-item .product-price,
+        .cart-header .product-quantity, .cart-item .product-quantity,
+        .cart-header .product-total, .cart-item .product-total {
+            margin-right: 20px;
+            flex: 1;
+            text-align: center;
+        }
+
+    .product-quantity {
+        display: flex;
+        align-items: center;
+    }
+
+    .quantity-btn {
+        background-color: #333;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        margin: 0 5px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+        .quantity-btn:hover {
+            background-color: #555;
+        }
+
+    .remove-btn {
+        background-color: #e60000;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+        .remove-btn:hover {
+            background-color: #cc0000;
+        }
+
+    .checkout-summary {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .checkout-btn {
+        background-color: #e60000;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        cursor: pointer;
+        border-radius: 10px;
+        margin: 10px;
+    }
+
+        .checkout-btn:hover {
+            background-color: #cc0000;
+        }
+</style>
+
+<div class="cart-container">
+    <div class="cart-header">
+        <div class="product-image"></div>
+        <div class="product-name">Sản phẩm</div>
+        <div class="product-name">Size</div>
+        <div class="product-name">Màu</div>
+        <div class="product-price">Giá</div>
+        <div class="product-quantity">Số lượng</div>
+        <div class="product-total">Tổng</div>
+        <div class="product-remove"></div>
+    </div>
+
+    @foreach (var item in cartItems)
+    {
+        <div class="cart-item">
+            <img src="@item.productItem.img" alt="@item.productItem.Name" class="product-image" />
+            <div class="product-name">@item.productItem.Name</div>
+            <div class="product-name">@item.productItem.size</div>
+            <div class="product-name">@item.productItem.color</div>
+            <div class="product-price">@string.Format("{0:0,0 đồng}", @item.productItem.Price)</div>
+            <div class="product-quantity">
+                <button @onclick="() => UpdateQuantity(item.productItem, -1)" class="quantity-btn">-</button>
+                <span>@item.Quantity</span>
+                <button @onclick="() => UpdateQuantity(item.productItem, 1)" class="quantity-btn">+</button>
+            </div>
+            <div class="product-total">@string.Format("{0:0,0 đồng}", (item.productItem.Price * item.Quantity))</div>
+            <button @onclick="() => RemoveItem(item.productItem)" class="remove-btn">X</button>
+        </div>
+    }
+
+    <div class="checkout-summary">
+        <div class="total-amount">
+            Tổng giá trị đơn hàng: @string.Format("{0:0,0 đồng}", cartItems.Sum(item => item.productItem.Price * item.Quantity))
+        </div>
+        <button @onclick="ContinuedShopping" class="checkout-btn">TIẾP TỤC MUA SẮM</button>
+        <button @onclick="ProceedToCheckout" class="checkout-btn">TIẾP TỤC THANH TOÁN</button>
+    </div>
+</div>
+
+@code {
+    private List<CartLine> cartItems = new List<CartLine>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCartItems();
+    }
+
+    private async Task LoadCartItems()
+    {
+        cartItems = await CartService.GetCartItems();
+    }
+
+    private async Task UpdateQuantity(ProductCartItem product, int quantity)
+    {
+        var cartItem = cartItems.FirstOrDefault(ci => ci.productItem.Id == product.Id);
+        if (cartItem != null)
+        {
+            var newQuantity = cartItem.Quantity + quantity;
+            // Kiểm tra để đảm bảo số lượng mới không vượt quá số lượng trong kho và không nhỏ hơn 1
+            if (newQuantity >= 1 && newQuantity <= product.ProductItemOptions)
+            {
+                await CartService.AddItemToCart(product, quantity);
+                await LoadCartItems(); // Reload cart items after update
+            }
+        }
+    }
+
+    private async Task RemoveItem(ProductCartItem product)
+    {
+        await CartService.RemoveItemFromCart(product);
+        await LoadCartItems(); // Reload cart items after removal
+    }
+
+    private void ProceedToCheckout()
+    {
+        // Implement the checkout logic
+    }
+
+    private void ContinuedShopping() => NavigationManager.NavigateTo("/");
+}

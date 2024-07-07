@@ -17,7 +17,7 @@ namespace ServerLibrary.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -95,6 +95,32 @@ namespace ServerLibrary.Data.Migrations
                     b.ToTable("ApplicationUsers");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Models.DiscountWarehouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DiscountId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DiscountWarehouses");
+                });
+
             modelBuilder.Entity("BaseLibrary.Models.Products.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -119,9 +145,6 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -142,8 +165,6 @@ namespace ServerLibrary.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("ProductId");
 
                     b.ToTable("Discounts");
@@ -154,9 +175,6 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
 
@@ -166,9 +184,12 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -181,15 +202,12 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<double>("Discount")
-                        .HasColumnType("float");
+                    b.Property<int?>("DiscountId")
+                        .HasColumnType("int");
 
                     b.Property<string>("OrderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -200,10 +218,9 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<double>("Total")
-                        .HasColumnType("float");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("DiscountId");
 
                     b.HasIndex("OrderId");
 
@@ -237,7 +254,7 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.Property<int>("Status")
@@ -312,9 +329,6 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateOnly>("CreatedAt")
                         .HasColumnType("date");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -324,11 +338,14 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<DateOnly?>("UpdatedAt")
                         .HasColumnType("date");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("ProductReviews");
                 });
@@ -586,34 +603,51 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("Address");
                 });
 
+            modelBuilder.Entity("BaseLibrary.Models.DiscountWarehouse", b =>
+                {
+                    b.HasOne("BaseLibrary.Models.Products.Discount", "Discount")
+                        .WithMany("Owners")
+                        .HasForeignKey("DiscountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseLibrary.Models.ApplicationUser", "User")
+                        .WithMany("Discounts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Discount");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BaseLibrary.Models.Products.Discount", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.ApplicationUser", "Customer")
-                        .WithMany("Discounts")
-                        .HasForeignKey("CustomerId");
-
                     b.HasOne("BaseLibrary.Models.Products.Product", "Product")
                         .WithMany("ProductDiscounts")
                         .HasForeignKey("ProductId");
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Product");
                 });
 
             modelBuilder.Entity("BaseLibrary.Models.Products.Order", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.ApplicationUser", "Customer")
+                    b.HasOne("BaseLibrary.Models.ApplicationUser", "User")
                         .WithMany("Orders")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BaseLibrary.Models.Products.OrderDetail", b =>
                 {
+                    b.HasOne("BaseLibrary.Models.Products.Discount", "Discount")
+                        .WithMany()
+                        .HasForeignKey("DiscountId");
+
                     b.HasOne("BaseLibrary.Models.Products.Order", "Order")
                         .WithMany("OrderDetails")
                         .HasForeignKey("OrderId")
@@ -631,6 +665,8 @@ namespace ServerLibrary.Data.Migrations
                         .HasForeignKey("ProductOptionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Discount");
 
                     b.Navigation("Order");
 
@@ -674,21 +710,21 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Models.Products.ProductReview", b =>
                 {
-                    b.HasOne("BaseLibrary.Models.ApplicationUser", "Customer")
-                        .WithMany("ProductReviews")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BaseLibrary.Models.Products.Product", "Product")
                         .WithMany("ProductReviews")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Customer");
+                    b.HasOne("BaseLibrary.Models.ApplicationUser", "User")
+                        .WithMany("ProductReviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Product");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("KimVinhHung.Api.Models.Address.District", b =>
@@ -748,6 +784,11 @@ namespace ServerLibrary.Data.Migrations
             modelBuilder.Entity("BaseLibrary.Models.Products.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Models.Products.Discount", b =>
+                {
+                    b.Navigation("Owners");
                 });
 
             modelBuilder.Entity("BaseLibrary.Models.Products.Order", b =>

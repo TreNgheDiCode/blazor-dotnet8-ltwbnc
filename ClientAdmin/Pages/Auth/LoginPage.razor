@@ -1,4 +1,5 @@
 ﻿@page "/auth/login"
+@using BaseLibrary.DTOs.Auth
 @using ClientAdmin.Pages.Components
 
 @layout AuthenticationLayout
@@ -15,7 +16,7 @@
                          <div class="row">
                              <div class="col-lg-4 col-md-4 col-sm-4"></div>
                              <div class="col-lg-4 col-md-4 col-sm-4 d-flex justify-content-center">
-                                 <img style="border-radius:20px" src="images/logo.jpg" height="50" width="50" />
+                                 <img style="border-radius:20px" src="images/logongang.png" height="50" width="50" />
                              </div>
                              <div class="col-lg-4 col-md-4 col-sm-4"></div>
                          </div>
@@ -32,7 +33,7 @@
                          <div class="form-group mt-3">
                              @if (ShowLoadingButton)
                             {
-                                <ButtonLoadingSpinner />
+                                <ButtonLoadingSpinner></ButtonLoadingSpinner>
                             }
                             else
                             {
@@ -56,17 +57,24 @@
     async Task HandleLogin()
     {
         ShowLoadingButton = true;
-        var result = await accountService.SignInAsync(User);
-        if (result.Flag)
+        try
         {
-            await DisplayDialog(result.Message, "Đăng nhập thành công");
-            var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
-            await customAuthStateProvider.UpdateAuthenticationState(new UserSession() { Token = result.Token, RefreshToken = result.RefreshToken });
-            NavManager.NavigateTo("/", forceLoad: true);
+            var result = await accountService.SignInAsync(User);
+            if (result.Flag)
+            {
+                await DisplayDialog(result.Message, "Đăng nhập thành công");
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(new UserSession() { Token = result.Token, RefreshToken = result.RefreshToken });
+                NavManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                await DisplayDialog(result.Message, "Đăng nhập thất bại");
+            }
         }
-        else
+        catch
         {
-            await DisplayDialog(result.Message, "Đăng nhập thất bại");
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi đăng nhập");
         }
 
         ShowLoadingButton = false;

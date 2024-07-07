@@ -1,4 +1,5 @@
 ﻿using BaseLibrary.DTOs;
+using BaseLibrary.DTOs.Auth;
 using BaseLibrary.Helpers.Client;
 using BaseLibrary.Responses;
 using ClientAdminLibrary.Services.Contracts;

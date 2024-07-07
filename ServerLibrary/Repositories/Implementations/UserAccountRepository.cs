@@ -1,4 +1,4 @@
-﻿using BaseLibrary.DTOs;
+﻿using BaseLibrary.DTOs.Auth;
 using BaseLibrary.Models;
 using BaseLibrary.Responses;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +51,10 @@ namespace ServerLibrary.Repositories.Implementations
                     WardId = user.WardId,
                     DistrictId = user.DistrictId,
                     ProvinceId = user.ProvinceId
-                }
+                },
+                CreatedAt = DateOnly.FromDateTime(DateTime.Now),
+                IsLocked = false
+
             });
 
             // Kiểm tra, tạo và gán role admin
