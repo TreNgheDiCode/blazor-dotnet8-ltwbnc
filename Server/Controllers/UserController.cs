@@ -10,7 +10,7 @@ namespace Server.Controllers
     public class UserController(IUserRepo repo) : ControllerBase
     {
         [HttpGet("users")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers(int? page, int? pageSize)
         {
             // Check if the user has the "Admin" role
@@ -21,6 +21,7 @@ namespace Server.Controllers
             }
 
             var result = await repo.GetUsers(page, pageSize);
+
             return Ok(result);
         }
 
@@ -39,7 +40,7 @@ namespace Server.Controllers
         }
 
         [HttpDelete("users/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             // Check if the user has the "Admin" role
@@ -50,7 +51,14 @@ namespace Server.Controllers
             }
 
             var result = await repo.DeleteUser(id);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            } else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

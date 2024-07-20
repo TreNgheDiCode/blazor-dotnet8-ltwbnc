@@ -29,5 +29,7 @@ namespace BaseLibrary.DTOs.Auth
         public string? ProvinceId { get; set; }
         // Ảnh đại diện
         public string? Photo { get; set; }
+        public string? Other { get; set; } // Thông tin khác
+        public string? Role { get; set; } // Vai trò
     }
 }

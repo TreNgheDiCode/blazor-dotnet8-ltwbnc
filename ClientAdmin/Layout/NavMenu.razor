@@ -3,7 +3,7 @@
 
 <AuthorizeView Roles="Admin">
     <Authorized>
-        <SfSidebar @ref="sidebar" ShowBackdrop="true" Width="256px" @bind-IsOpen="SidebarToggle" Target="@Target" MediaQuery="(min-width: 600px)">
+        <SfSidebar @ref="sidebar" Width="256px" @bind-IsOpen="SidebarToggle" Target="@Target" MediaQuery="(min-width: 600px)">
             <ChildContent>
                 <img src="images/logongang.png" alt="Logo" class="img-fluid">
                 <div class="text-center fs-5 mb-4">Bảng điều khiển</div>

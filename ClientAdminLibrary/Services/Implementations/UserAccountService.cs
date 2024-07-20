@@ -42,5 +42,19 @@ namespace ClientAdminLibrary.Services.Implementations
 
             return await result.Content.ReadFromJsonAsync<LoginResponse>();
         }
+
+        public async Task<GeneralResponse> CreateAsync(Register user)
+        {
+            var httpClient = getHttpClient.GetPublicHttpClient();
+
+            var result = await httpClient.PostAsJsonAsync(AuthUrl + "/register", user);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                return new GeneralResponse(false, "Failed to create user");
+            }
+
+            return await result.Content.ReadFromJsonAsync<GeneralResponse>();
+        }
     }
 }

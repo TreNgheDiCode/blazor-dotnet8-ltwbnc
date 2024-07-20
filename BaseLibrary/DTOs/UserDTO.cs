@@ -28,18 +28,13 @@
         public string? Fullname { get; set; } // Tên đầy đủ
         public string? Email { get; set; } // Email
         public string? PhoneNumber { get; set; } // Số điện thoại
-        public AddressDetail? Address { get; set; } // Địa chỉ
+        public string? Address { get; set; } // Địa chỉ
+        public string WardId { get; set; } = string.Empty; // Phường
+        public string DistrictId { get; set; } = string.Empty; // Quận
+        public string ProvinceId { get; set; } = string.Empty; // Thành phố
         public string? Photo { get; set; } // Ảnh đại diện
         public string? Other { get; set; } // Thông tin khác
         public bool? IsLocked { get; set; } // Đã khóa
         public string? Role { get; set; } // Vai trò
-    }
-
-    public record AddressDetail
-    {
-        public string Address { get; set; } = string.Empty; // Đường
-        public string WardId { get; set; } = string.Empty; // Phường
-        public string DistrictId { get; set; } = string.Empty; // Quận
-        public string ProvinceId { get; set; } = string.Empty; // Thành phố
     }
 }

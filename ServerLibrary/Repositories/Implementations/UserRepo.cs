@@ -211,19 +211,19 @@ namespace ServerLibrary.Repositories.Implementations
             }
 
             // Nếu mã phường/xã/thị trấn không hợp lệ, trả về lỗi
-            if (user.Address != null && !context.Wards.Any(w => w.Code == user.Address.WardId))
+            if (user.WardId != null && !context.Wards.Any(w => w.Code == user.WardId))
             {
                 return new GeneralResponse(false, "Mã phường/xã/thị trấn không hợp lệ");
             }
 
             // Nếu mã quận/huyện không hợp lệ, trả về lỗi
-            if (user.Address != null && !context.Districts.Any(d => d.Code == user.Address.DistrictId))
+            if (user.DistrictId != null && !context.Districts.Any(d => d.Code == user.DistrictId))
             {
                 return new GeneralResponse(false, "Mã quận/huyện không hợp lệ");
             }
 
             // Nếu mã tỉnh/thành phố không hợp lệ, trả về lỗi
-            if (user.Address != null && !context.Provinces.Any(p => p.Code == user.Address.ProvinceId))
+            if (user.ProvinceId != null && !context.Provinces.Any(p => p.Code == user.ProvinceId))
             {
                 return new GeneralResponse(false, "Mã tỉnh/thành phố không hợp lệ");
             }
@@ -232,13 +232,26 @@ namespace ServerLibrary.Repositories.Implementations
             userWithRole.u.Fullname = user.Fullname;
             userWithRole.u.Email = user.Email;
             userWithRole.u.PhoneNumber = user.PhoneNumber;
-            userWithRole.u.Address = user.Address != null ? new Address
+            // Tìm địa chỉ của user hiện tại và cập nhật, nếu không tìm thấy thì tạo mới
+            Address address = await context.Addresses.FindAsync(userWithRole.u.AddressId);
+            if (address is null)
             {
-                AddressDetail = user.Address.Address,
-                WardId = user.Address.WardId,
-                DistrictId = user.Address.DistrictId,
-                ProvinceId = user.Address.ProvinceId
-            } : null;
+                address = new Address
+                {
+                    AddressDetail = user.Address,
+                    WardId = user.WardId,
+                    DistrictId = user.DistrictId,
+                    ProvinceId = user.ProvinceId
+                };
+                context.Addresses.Add(address);
+            }
+            else
+            {
+                address.AddressDetail = user.Address;
+                address.WardId = user.WardId;
+                address.DistrictId = user.DistrictId;
+                address.ProvinceId = user.ProvinceId;
+            }
             userWithRole.u.Photo = user.Photo;
             userWithRole.u.Other = user.Other;
             userWithRole.u.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
@@ -253,8 +266,30 @@ namespace ServerLibrary.Repositories.Implementations
                     .Select(r => r.Id)
                     .FirstOrDefaultAsync();
 
-                // Cập nhật vai trò
-                userWithRole.r.Id = roleId;
+                // Cập nhật vai trò trong bảng vai trò người dùng
+                var userRole = await context.UserRoles
+                    .Where(ur => ur.UserId == userWithRole.u.Id)
+                    .FirstOrDefaultAsync();
+
+                if (roleId == 0) {
+                    return new GeneralResponse(false, "Vai trò không hợp lệ");
+                }
+
+                if (userRole is null)
+                {
+                    userRole = new UserRole
+                    {
+                        UserId = userWithRole.u.Id,
+                        RoleId = roleId
+                    };
+                    context.UserRoles.Add(userRole);
+                }
+                else
+                {
+                    userRole.RoleId = roleId;
+                }
+
+                userRole.RoleId = roleId;
             }
 
             // Lưu thay đổi
