@@ -13,43 +13,64 @@ namespace Server.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers(int? page, int? pageSize)
         {
-            // Check if the user has the "Admin" role
-            if (!User.IsInRole("Admin"))
-            {
-                // Return a custom error response
-                return Unauthorized(new { Error = "Quyền hạn không hợp lệ." });
-            }
-
             var result = await repo.GetUsers(page, pageSize);
 
-            return Ok(result);
+            if (result.Success == true)
+            {
+                return Ok(result);
+            } else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpGet("users/{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
             var result = await repo.GetUser(id);
-            return Ok(result);
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            } else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpPut("users/{id}")]
         public async Task<IActionResult> UpdateUser(int id, UpdateUserDTO user)
         {
             var result = await repo.UpdateUser(id, user);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            } else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPost("users/{id}/lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> LockUser(int id)
+        {
+            var result = await repo.LockUser(id);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            } else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpDelete("users/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            // Check if the user has the "Admin" role
-            if (!User.IsInRole("Admin"))
-            {
-                // Return a custom error response
-                return Unauthorized(new { Error = "Quyền hạn không hợp lệ." });
-            }
-
             var result = await repo.DeleteUser(id);
 
             if (result.Flag)

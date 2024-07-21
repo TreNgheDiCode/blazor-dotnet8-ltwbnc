@@ -9,6 +9,7 @@
 @using Syncfusion.Blazor.DropDowns
 @using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
 
 <div class="bg-white shadow-lg p-2">
     <h1 class="text-black
@@ -19,176 +20,187 @@
     </h1>
 </div>
 
-<div class="px-4">
-    <SfBreadcrumb class="my-2">
-        <BreadcrumbItems>
-            <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
-            <BreadcrumbItem Text="Người dùng" IconCss="bi bi-people" Url="/user"></BreadcrumbItem>
-            <BreadcrumbItem Text="Thêm người dùng" IconCss="bi bi-person-add"></BreadcrumbItem>
-        </BreadcrumbItems>
-        <BreadcrumbTemplates>
-            <ItemTemplate>
-                <SfChip>
-                    <ChipItems>
-                        <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
-                    </ChipItems>
-                </SfChip>
-            </ItemTemplate>
-            <SeparatorTemplate>
-                <span class="e-icons e-bullet-arrow"></span>
-            </SeparatorTemplate>
-        </BreadcrumbTemplates>
-    </SfBreadcrumb>
-
-    <SfDataForm ID="CreateUserForm" Model="@userDetail" ButtonsAlignment="FormButtonsAlignment.Center" ColumnCount="2" ColumnSpacing="24px" ValidationDisplayMode="FormValidationDisplay.Tooltip" OnSubmit="@SubmitHandler">
-        <FormValidator>
-            <DataAnnotationsValidator></DataAnnotationsValidator>
-            <ValidationSummary></ValidationSummary>
-        </FormValidator>
-        <FormItems>
-            <FormGroup LabelText="Ảnh đại diện" ID="user-cover-group">
-                <FormItem Field="@nameof(userDetail.Photo)" LabelText="Ảnh đại diện">
-                    <Template>
-                        @if (string.IsNullOrEmpty(ImageUrl))
-                            {
-                                <label>Chọn ảnh đại diện</label>
-                                <SfUploader AutoUpload="true" AllowedExtensions=".png, .jpeg, .webp, .svg, .gif, .bmp, .tiff, .jpg">
-                                    <UploaderEvents ValueChange="@OnUploadImages">
-                                    </UploaderEvents>
-                                </SfUploader>
-                            }
-                            else
-                            {
-                                <div class="e-avatar e-avatar-xlarge e-avatar-circle">
-                                    <img src="@ImageUrl" alt="User Avatar" />
-                                </div>
-                            }
-                        </Template>
-                    </FormItem>
-                </FormGroup>
-                <FormGroup LabelText="Thông tin cá nhân" ID="user-information-group" ColumnCount="6" ColumnSpacing="16px">
-                    <FormItem Field="@nameof(userDetail.Fullname)" LabelText="Họ và Tên" ColumnSpan="3"></FormItem>
-                    <FormItem Field="@nameof(userDetail.Email)" LabelText="Email" ColumnSpan="3"></FormItem>
-                    <FormItem Field="@nameof(userDetail.Password)" LabelText="Mật khẩu" ColumnSpan="3"></FormItem>
-                    <FormItem Field="@nameof(userDetail.ConfirmPassword)" LabelText="Nhập lại mật khẩu" ColumnSpan="3"></FormItem>
-                    <FormItem Field="@nameof(userDetail.PhoneNumber)" LabelText="Số điện thoại" ColumnSpan="3"></FormItem>
-                    <FormItem Field="@nameof(userDetail.Address)" LabelText="Địa chỉ cụ thể" ColumnSpan="3"></FormItem>
-                    <FormItem Field="@nameof(userDetail.ProvinceId)" LabelText="Chọn tỉnh/thành phố" ColumnSpan="2">
-                        <Template>
-                            <label class="e-form-label">Chọn tỉnh/thành phố</label>
-                            <SfAutoComplete @ref="autoObjProvince" TValue="ProvinceItem" TItem="ProvinceItem" Placeholder="Chọn tỉnh/thành phố" DataSource="@Provinces" Highlight="true" CssClass="e-multi-column">
-                                <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
-                                <AutoCompleteEvents Filtering="OnProvinceFiltering" TValue="ProvinceItem" TItem="ProvinceItem" OnValueSelect="@OnProvinceSelecthandler"></AutoCompleteEvents>
-                                <AutoCompleteTemplates TItem="ProvinceItem">
-                                    <HeaderTemplate>
-                                        <table>
-                                            <tr>
-                                                <th>Mã</th>
-                                                <th>Tỉnh/thành phố</th>
-                                            </tr>
-                                        </table>
-                                    </HeaderTemplate>
-                                    <ItemTemplate Context="itemContext">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td>@itemContext.Code</td>
-                                                    <td>@itemContext.FullName</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </ItemTemplate>
-                                </AutoCompleteTemplates>
-                            </SfAutoComplete>
-                        </Template>
-                    </FormItem>
-                    <FormItem Field="@nameof(userDetail.DistrictId)" LabelText="Chọn quận/huyện" ColumnSpan="2">
-                        <Template>
-                            <label class="e-form-label">Chọn quận/huyện</label>
-                            <SfAutoComplete @ref="autoObjDistrict" TValue="DistrictItem" TItem="DistrictItem" Placeholder="Chọn quận/huyện" DataSource="@Districts" Highlight="true" CssClass="e-multi-column">
-                                <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
-                                <AutoCompleteEvents Filtering="OnDistrictFiltering" TValue="DistrictItem" TItem="DistrictItem" OnValueSelect="@OnDistrictSelecthandler"></AutoCompleteEvents>
-                                <AutoCompleteTemplates TItem="DistrictItem">
-                                    <HeaderTemplate>
-                                        <table>
-                                            <tr>
-                                                <th>Mã</th>
-                                                <th>Quận/huyện</th>
-                                            </tr>
-                                        </table>
-                                    </HeaderTemplate>
-                                    <ItemTemplate Context="itemContext">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td>@itemContext.Code</td>
-                                                    <td>@itemContext.FullName</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </ItemTemplate>
-                                </AutoCompleteTemplates>
-                            </SfAutoComplete>
-                        </Template>
-                    </FormItem>
-                    <FormItem Field="@nameof(userDetail.WardId)" LabelText="Chọn phường/xã" ColumnSpan="2">
-                        <Template>
-                            <label class="e-form-label">Chọn phường/xã</label>
-                            <SfAutoComplete @ref="autoObjWard" TValue="WardItem" TItem="WardItem" Placeholder="Chọn phường/xã" DataSource="@Wards" Highlight="true" CssClass="e-multi-column">
-                                <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
-                                <AutoCompleteEvents Filtering="OnWardFiltering" TValue="WardItem" TItem="WardItem" OnValueSelect="@OnWardSelecthandler"></AutoCompleteEvents>
-                                <AutoCompleteTemplates TItem="WardItem">
-                                    <HeaderTemplate>
-                                        <table>
-                                            <tr>
-                                                <th>Mã</th>
-                                                <th>Phường/xã</th>
-                                            </tr>
-                                        </table>
-                                    </HeaderTemplate>
-                                    <ItemTemplate Context="itemContext">
-                                        <table>
-                                            <tbody>
-                                                <tr>
-                                                    <td>@itemContext.Code</td>
-                                                    <td>@itemContext.FullName</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </ItemTemplate>
-                                </AutoCompleteTemplates>
-                            </SfAutoComplete>
-                        </Template>
-                    </FormItem>
-                    <FormItem Field="@nameof(userDetail.Role)" LabelText="Ủy quyền" ColumnSpan="6" ID="Role">
-                        <Template>
-                            <label for="@nameof(userDetail.Role)" class="e-form-label">Chọn ủy quyền</label>
-                            <SfDropDownList TValue="string" TItem="SystemRole" DataSource="@Roles" @bind-Value="userDetail.Role" Placeholder="Chọn ủy quyền" CssClass="e-multi-column" ID="Role">
-                                <DropDownListTemplates TItem="SystemRole">
-                                    <ValueTemplate>
-                                        @if (context.Name == "Admin")
-                                        {
-                                            <span class="badge bg-danger">Quản trị viên</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-success">Người dùng</span>
-                                        }
-                                    </ValueTemplate>
-                                </DropDownListTemplates>
-                                <DropDownListFieldSettings Text="Name" Value="Name"></DropDownListFieldSettings>
-                            </SfDropDownList>
-                        </Template>
-                    </FormItem>
-                </FormGroup>
-            </FormItems>
-            <FormButtons>
-                <SfButton typeof="submit">Thêm người dùng</SfButton>
-            </FormButtons>
-        </SfDataForm>
+@if (IsLoading == true)
+{
+    <div class="d-flex justify-content-center align-items-center">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
     </div>
+}
+else
+{
+    <div class="px-4">
+        <SfBreadcrumb class="my-2">
+            <BreadcrumbItems>
+                <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
+                <BreadcrumbItem Text="Người dùng" IconCss="bi bi-people" Url="/user"></BreadcrumbItem>
+                <BreadcrumbItem Text="Thêm người dùng" IconCss="bi bi-person-add"></BreadcrumbItem>
+            </BreadcrumbItems>
+            <BreadcrumbTemplates>
+                <ItemTemplate>
+                    <SfChip>
+                        <ChipItems>
+                            <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
+                        </ChipItems>
+                    </SfChip>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                    <span class="e-icons e-bullet-arrow"></span>
+                </SeparatorTemplate>
+            </BreadcrumbTemplates>
+        </SfBreadcrumb>
 
-    @code {
+        <SfDataForm ID="CreateUserForm" Model="@userDetail" ButtonsAlignment="FormButtonsAlignment.Center" ColumnCount="2" ColumnSpacing="24px" ValidationDisplayMode="FormValidationDisplay.Tooltip" OnSubmit="@SubmitHandler">
+            <FormValidator>
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <ValidationSummary></ValidationSummary>
+            </FormValidator>
+            <FormItems>
+                <FormGroup LabelText="Ảnh đại diện" ID="user-cover-group">
+                    <FormItem Field="@nameof(userDetail.Photo)" LabelText="Ảnh đại diện">
+                        <Template>
+                            @if (string.IsNullOrEmpty(ImageUrl))
+                                {
+                                    <label>Chọn ảnh đại diện</label>
+                                    <SfUploader AutoUpload="true" AllowedExtensions=".png, .jpeg, .webp, .svg, .gif, .bmp, .tiff, .jpg">
+                                        <UploaderEvents ValueChange="@OnUploadImages">
+                                        </UploaderEvents>
+                                    </SfUploader>
+                                }
+                                else
+                                {
+                                    <div class="e-avatar e-avatar-xlarge e-avatar-circle">
+                                        <img src="@ImageUrl" alt="User Avatar" />
+                                    </div>
+                                }
+                            </Template>
+                        </FormItem>
+                    </FormGroup>
+                    <FormGroup LabelText="Thông tin cá nhân" ID="user-information-group" ColumnCount="6" ColumnSpacing="16px">
+                        <FormItem Field="@nameof(userDetail.Fullname)" LabelText="Họ và Tên" ColumnSpan="3"></FormItem>
+                        <FormItem Field="@nameof(userDetail.Email)" LabelText="Email" ColumnSpan="3"></FormItem>
+                        <FormItem Field="@nameof(userDetail.Password)" LabelText="Mật khẩu" ColumnSpan="3"></FormItem>
+                        <FormItem Field="@nameof(userDetail.ConfirmPassword)" LabelText="Nhập lại mật khẩu" ColumnSpan="3"></FormItem>
+                        <FormItem Field="@nameof(userDetail.PhoneNumber)" LabelText="Số điện thoại" ColumnSpan="3"></FormItem>
+                        <FormItem Field="@nameof(userDetail.Address)" LabelText="Địa chỉ cụ thể" ColumnSpan="3"></FormItem>
+                        <FormItem Field="@nameof(userDetail.ProvinceId)" LabelText="Chọn tỉnh/thành phố" ColumnSpan="2">
+                            <Template>
+                                <label class="e-form-label">Chọn tỉnh/thành phố</label>
+                                <SfAutoComplete @ref="autoObjProvince" TValue="ProvinceItem" TItem="ProvinceItem" Placeholder="Chọn tỉnh/thành phố" DataSource="@Provinces" Highlight="true" CssClass="e-multi-column">
+                                    <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
+                                    <AutoCompleteEvents Filtering="OnProvinceFiltering" TValue="ProvinceItem" TItem="ProvinceItem" OnValueSelect="@OnProvinceSelecthandler"></AutoCompleteEvents>
+                                    <AutoCompleteTemplates TItem="ProvinceItem">
+                                        <HeaderTemplate>
+                                            <table>
+                                                <tr>
+                                                    <th>Mã</th>
+                                                    <th>Tỉnh/thành phố</th>
+                                                </tr>
+                                            </table>
+                                        </HeaderTemplate>
+                                        <ItemTemplate Context="itemContext">
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>@itemContext.Code</td>
+                                                        <td>@itemContext.FullName</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </ItemTemplate>
+                                    </AutoCompleteTemplates>
+                                </SfAutoComplete>
+                            </Template>
+                        </FormItem>
+                        <FormItem Field="@nameof(userDetail.DistrictId)" LabelText="Chọn quận/huyện" ColumnSpan="2">
+                            <Template>
+                                <label class="e-form-label">Chọn quận/huyện</label>
+                                <SfAutoComplete @ref="autoObjDistrict" TValue="DistrictItem" TItem="DistrictItem" Placeholder="Chọn quận/huyện" DataSource="@Districts" Highlight="true" CssClass="e-multi-column">
+                                    <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
+                                    <AutoCompleteEvents Filtering="OnDistrictFiltering" TValue="DistrictItem" TItem="DistrictItem" OnValueSelect="@OnDistrictSelecthandler"></AutoCompleteEvents>
+                                    <AutoCompleteTemplates TItem="DistrictItem">
+                                        <HeaderTemplate>
+                                            <table>
+                                                <tr>
+                                                    <th>Mã</th>
+                                                    <th>Quận/huyện</th>
+                                                </tr>
+                                            </table>
+                                        </HeaderTemplate>
+                                        <ItemTemplate Context="itemContext">
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>@itemContext.Code</td>
+                                                        <td>@itemContext.FullName</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </ItemTemplate>
+                                    </AutoCompleteTemplates>
+                                </SfAutoComplete>
+                            </Template>
+                        </FormItem>
+                        <FormItem Field="@nameof(userDetail.WardId)" LabelText="Chọn phường/xã" ColumnSpan="2">
+                            <Template>
+                                <label class="e-form-label">Chọn phường/xã</label>
+                                <SfAutoComplete @ref="autoObjWard" TValue="WardItem" TItem="WardItem" Placeholder="Chọn phường/xã" DataSource="@Wards" Highlight="true" CssClass="e-multi-column">
+                                    <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
+                                    <AutoCompleteEvents Filtering="OnWardFiltering" TValue="WardItem" TItem="WardItem" OnValueSelect="@OnWardSelecthandler"></AutoCompleteEvents>
+                                    <AutoCompleteTemplates TItem="WardItem">
+                                        <HeaderTemplate>
+                                            <table>
+                                                <tr>
+                                                    <th>Mã</th>
+                                                    <th>Phường/xã</th>
+                                                </tr>
+                                            </table>
+                                        </HeaderTemplate>
+                                        <ItemTemplate Context="itemContext">
+                                            <table>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>@itemContext.Code</td>
+                                                        <td>@itemContext.FullName</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </ItemTemplate>
+                                    </AutoCompleteTemplates>
+                                </SfAutoComplete>
+                            </Template>
+                        </FormItem>
+                        <FormItem Field="@nameof(userDetail.Role)" LabelText="Ủy quyền" ColumnSpan="6" ID="Role">
+                            <Template>
+                                <label for="@nameof(userDetail.Role)" class="e-form-label">Chọn ủy quyền</label>
+                                <SfDropDownList TValue="string" TItem="SystemRole" DataSource="@Roles" @bind-Value="userDetail.Role" Placeholder="Chọn ủy quyền" CssClass="e-multi-column" ID="Role">
+                                    <DropDownListTemplates TItem="SystemRole">
+                                        <ValueTemplate>
+                                            @if (context.Name == "Admin")
+                                            {
+                                                <span class="badge bg-danger">Quản trị viên</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">Người dùng</span>
+                                            }
+                                        </ValueTemplate>
+                                    </DropDownListTemplates>
+                                    <DropDownListFieldSettings Text="Name" Value="Name"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </Template>
+                        </FormItem>
+                    </FormGroup>
+                </FormItems>
+                <FormButtons>
+                    <SfButton typeof="submit">Thêm người dùng</SfButton>
+                </FormButtons>
+            </SfDataForm>
+        </div>
+}
+
+@code {
+    private bool IsLoading { get; set; } = false;
     SfAutoComplete<ProvinceItem, ProvinceItem> autoObjProvince;
     SfAutoComplete<DistrictItem, DistrictItem> autoObjDistrict;
     SfAutoComplete<WardItem, WardItem> autoObjWard;
@@ -212,6 +224,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
         try
         {
             ServiceModel<ProvinceList> result = await addressService.GetProvinces();
@@ -224,6 +237,10 @@
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách tỉnh/thành phố");
         }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     public async void SubmitHandler(EditContext context)
@@ -232,6 +249,7 @@
 
         if (isValid)
         {
+            IsLoading = true;
             try
             {
                 userDetail.Photo = ImageUrl;
@@ -251,6 +269,10 @@
             catch (Exception ex)
             {
                 await DisplayDialog(ex.ToString(), "Lỗi tạo người dùng");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
     }

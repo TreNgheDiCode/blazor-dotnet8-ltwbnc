@@ -20,13 +20,16 @@ namespace ClientAdminLibrary.Services.Implementations
 
             if (result.IsSuccessStatusCode)
             {
-                return new GeneralResponse(true, "Xóa người dùng thành công");
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Xóa người dùng thành công");
             }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
 
-            // Get the response message
-            var response = await result.Content.ReadAsStringAsync();
-
-            return new GeneralResponse(false, response);
+                return errorResponse ?? new GeneralResponse(false, "Xóa người dùng thất bại");
+            }
         }
 
         public async Task<ServiceModel<UserItem>> GetUser(int id)
@@ -67,6 +70,25 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
+        public async Task<GeneralResponse> LockUser(int id)
+        {
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PostAsync($"{UserUrl}/{id}/lock", null);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Khóa người dùng thành công");
+            } else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Khóa người dùng thất bại");
+            }
+        }
+
         public async Task<GeneralResponse> UpdateUser(int id, UpdateUserDTO user)
         {
             var client = await httpClient.GetPrivateHttpClient();
@@ -75,10 +97,16 @@ namespace ClientAdminLibrary.Services.Implementations
 
             if (result.IsSuccessStatusCode)
             {
-                return new GeneralResponse(true, "Cập nhật người dùng thành công");
-            }
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
 
-            return new GeneralResponse(false, "Cập nhật người dùng thất bại");
+                return successResponse ?? new GeneralResponse(false, "Cập nhật thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Cập nhật thất bại");
+            }
         }
     }
 }

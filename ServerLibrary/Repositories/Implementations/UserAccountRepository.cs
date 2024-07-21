@@ -119,7 +119,7 @@ namespace ServerLibrary.Repositories.Implementations
             if (getRoleName is null) return new LoginResponse(false, "Không tìm thấy quyền hạn người dùng");
 
             // Nếu tài khoản bị khóa
-            if (applicationUser.IsLocked is not null && applicationUser.IsLocked == true)
+            if (applicationUser.IsLocked == true)
                 return new LoginResponse(false, "Tài khoản đã bị khóa");
 
             // Tạo token jwt

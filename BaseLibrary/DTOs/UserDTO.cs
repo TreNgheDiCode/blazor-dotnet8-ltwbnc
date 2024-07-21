@@ -19,7 +19,7 @@
         public string? Photo { get; set; } // Ảnh đại diện
         public string? Other { get; set; } // Thông tin khác
         public DateOnly? CreatedAt { get; set; } = DateOnly.FromDateTime(DateTime.Now); // Ngày tạo
-        public bool? IsLocked { get; set; } // Đã khóa
+        public bool IsLocked { get; set; } // Đã khóa
         public string? Role { get; set; } // Vai trò
     }
 
@@ -34,7 +34,7 @@
         public string ProvinceId { get; set; } = string.Empty; // Thành phố
         public string? Photo { get; set; } // Ảnh đại diện
         public string? Other { get; set; } // Thông tin khác
-        public bool? IsLocked { get; set; } // Đã khóa
+        public bool IsLocked { get; set; } // Đã khóa
         public string? Role { get; set; } // Vai trò
     }
 }

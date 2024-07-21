@@ -333,7 +333,7 @@ else
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi tải ảnh lên máy chủ");
         }
@@ -353,10 +353,12 @@ else
                 if (res.Flag == false)
                 {
                     await DisplayDialog(res.Message, "Thông báo");
+
+                    NavManager.NavigateTo("/user");
                 }
                 else
                 {
-                    await DisplayDialog("Cập nhật người dùng thành công", "Thông báo");
+                    await DisplayDialog(res.Message, "Thông báo");
 
                     NavManager.NavigateTo("/user");
                 }

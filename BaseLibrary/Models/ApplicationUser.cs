@@ -15,7 +15,7 @@ namespace BaseLibrary.Models
         public string? Photo { get; set; } // Ảnh đại diện
         public string? Other { get; set; } // Thông tin khác
         public DateOnly? CreatedAt { get; set; } // Ngày tạo
-        public bool? IsLocked { get; set; } // Đã khóa
+        public bool IsLocked { get; set; } // Đã khóa
 
         // Quan hệ đến bảng Đánh giá: Một - Nhiều
         [JsonIgnore]
