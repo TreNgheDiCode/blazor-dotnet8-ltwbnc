@@ -22,7 +22,43 @@ namespace Server.Controllers
 
             var result = await cloudinaryRepo.UploadImageAsync(filePath);
 
-            return Ok(result);
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
+        [HttpPost("multiple")]
+        public async Task<IActionResult> UploadImages(IFormFile[] files)
+        {
+            List<string> filePaths = new();
+
+            foreach (var file in files)
+            {
+                var filePath = Path.GetTempFileName();
+
+                using (var stream = System.IO.File.Create(filePath))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                filePaths.Add(filePath);
+            }
+
+            var result = await cloudinaryRepo.UploadImagesAsync(filePaths.ToArray());
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

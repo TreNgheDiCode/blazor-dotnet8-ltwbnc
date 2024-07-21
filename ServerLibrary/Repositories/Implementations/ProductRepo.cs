@@ -33,6 +33,15 @@ namespace ServerLibrary.Repositories.Implementations
                 return new GeneralResponse(false, "Sản phẩm với tên này đã tồn tại trong cùng danh mục");
             }
 
+            // Đẩy ảnh bìa làm ảnh đầu tiên trong danh sách hình ảnh
+            if (product.CoverUrl is not null)
+            {
+                product.ProductImages.Insert(0, new ProductImageDTO
+                {
+                    ImageUrl = product.CoverUrl
+                });
+            }
+
             // Tạo sản phẩm mới
             Product newProduct = new()
             {
@@ -40,7 +49,6 @@ namespace ServerLibrary.Repositories.Implementations
                 Description = product.Description,
                 Price = product.Price,
                 Discount = product.Discount,
-                IsFlashSale = product.IsFlashSale,
                 Status = product.Status,
                 CategoryId = product.CategoryId,
                 ProductImages = product.ProductImages.Select(pi => new ProductImage
@@ -201,6 +209,26 @@ namespace ServerLibrary.Repositories.Implementations
             await context.SaveChangesAsync();
 
             return new GeneralResponse(true, "Xóa tùy chọn thành công");
+        }
+
+        public async Task<GeneralResponse> FlashSale(int id)
+        {
+            // Lấy sản phẩm theo ID
+            Product? product = await context.Products.FindAsync(id);
+
+            // Nếu không tìm thấy sản phẩm
+            if (product == null)
+            {
+                return new GeneralResponse(false, "Không tìm thấy sản phẩm");
+            }
+
+            // Đảo trạng thái flash sale của sản phẩm
+            product.IsFlashSale = !product.IsFlashSale;
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await context.SaveChangesAsync();
+
+            return new GeneralResponse(true, "Cập nhật trạng thái flash sale thành công");
         }
 
         public async Task<ServiceModel<ProductItem>> GetProductById(int id)
@@ -412,7 +440,6 @@ namespace ServerLibrary.Repositories.Implementations
             productToUpdate.Description = product.Description;
             productToUpdate.Price = product.Price;
             productToUpdate.Discount = product.Discount;
-            productToUpdate.IsFlashSale = product.IsFlashSale;
             productToUpdate.Status = product.Status;
             productToUpdate.CategoryId = product.CategoryId;
             productToUpdate.ProductImages = product.ProductImages.Select(pi => new ProductImage

@@ -8,7 +8,7 @@ namespace BaseLibrary.Models.Products
         public string? Description { get; set; } // Mô tả sản phẩm
         public double Price { get; set; } // Giá gốc
         public int? Discount { get; set; } // % Giảm giá
-        public bool? IsFlashSale { get; set; } // Có đang giảm giá
+        public bool IsFlashSale { get; set; } // Có đang giảm giá
         public ProductStatus Status { get; set; } // Trạng thái sản phẩm
 
         // Quan hệ đến bảng Hình ảnh sản phẩm: Một - Nhiều

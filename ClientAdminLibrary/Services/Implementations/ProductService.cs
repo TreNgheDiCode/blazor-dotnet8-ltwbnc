@@ -10,19 +10,83 @@ namespace ClientAdminLibrary.Services.Implementations
     {
         public const string ProductUrl = "api/products";
 
-        public Task<GeneralResponse> CreateProduct(CreateProductDTO product)
+        public async Task<GeneralResponse> CreateProduct(CreateProductDTO product)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PostAsJsonAsync(ProductUrl, product);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Thêm sản phẩm thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Thêm sản phẩm thất bại");
+            }
         }
 
-        public Task<GeneralResponse> DeleteProduct(int id)
+        public async Task<GeneralResponse> DeleteProduct(int id)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.DeleteAsync($"{ProductUrl}/{id}");
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Xóa sản phẩm thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Xóa sản phẩm thất bại");
+            }
         }
 
-        public Task<ServiceModel<ProductItem>> GetProduct(int id)
+        public async Task<GeneralResponse> FlashSale(int id)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PutAsync($"{ProductUrl}/{id}/flash-sale", null);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Khuyến mãi thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Khuyến mãi thất bại");
+            }
+        }
+
+        public async Task<ServiceModel<ProductItem>> GetProduct(int id)
+        {
+            var client = httpClient.GetPublicHttpClient();
+            var result = await client.GetFromJsonAsync<ServiceModel<ProductItem>>($"{ProductUrl}/{id}");
+
+            // Neu result la null thi throw exception
+            if (result == null)
+            {
+                return new ServiceModel<ProductItem>()
+                {
+                    Data = new ProductItem(),
+                    Message = "Lỗi máy chủ",
+                    Success = false
+                };
+            }
+
+            return result;
         }
 
         public async Task<ServiceModel<ProductList>> GetProducts()
@@ -44,9 +108,24 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
-        public Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO product)
+        public async Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO product)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PutAsJsonAsync($"{ProductUrl}/{id}", product);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Cập nhật sản phẩm thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Cập nhật sản phẩm thất bại");
+            }
         }
     }
 }

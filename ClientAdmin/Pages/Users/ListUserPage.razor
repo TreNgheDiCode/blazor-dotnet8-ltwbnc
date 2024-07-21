@@ -93,7 +93,6 @@ else
                     <Template>
                         @{
                             var user = (context as UserItem);
-                            var IsLocked = user.IsLocked;
 
                             <div class="d-flex flex-row align-items-center justify-content-center">
                                 <SfSwitch @bind-Checked="user.IsLocked" CssClass="custom-iOS" TChecked="bool" ValueChange="@(args => OnLockUser(args, user.Id))"></SfSwitch>
@@ -144,8 +143,6 @@ else
             else
             {
                 await DisplayDialog(res.Message, "Thông báo");
-                // Không cho phép thay đổi trạng thái
-                args.Checked = false;
             }
         }
         else

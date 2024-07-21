@@ -53,7 +53,6 @@ else
         <SfDataForm ID="CreateUserForm" Model="@userDetail" ButtonsAlignment="FormButtonsAlignment.Center" ColumnCount="2" ColumnSpacing="24px" ValidationDisplayMode="FormValidationDisplay.Tooltip" OnSubmit="@SubmitHandler">
             <FormValidator>
                 <DataAnnotationsValidator></DataAnnotationsValidator>
-                <ValidationSummary></ValidationSummary>
             </FormValidator>
             <FormItems>
                 <FormGroup LabelText="Ảnh đại diện" ID="user-cover-group">
@@ -110,6 +109,7 @@ else
                                         </ItemTemplate>
                                     </AutoCompleteTemplates>
                                 </SfAutoComplete>
+                                <ValidationMessage For="@(() => userDetail.ProvinceId)"></ValidationMessage>
                             </Template>
                         </FormItem>
                         <FormItem Field="@nameof(userDetail.DistrictId)" LabelText="Chọn quận/huyện" ColumnSpan="2">
@@ -139,6 +139,7 @@ else
                                         </ItemTemplate>
                                     </AutoCompleteTemplates>
                                 </SfAutoComplete>
+                                <ValidationMessage For="@(() => userDetail.DistrictId)"></ValidationMessage>
                             </Template>
                         </FormItem>
                         <FormItem Field="@nameof(userDetail.WardId)" LabelText="Chọn phường/xã" ColumnSpan="2">
@@ -168,6 +169,7 @@ else
                                         </ItemTemplate>
                                     </AutoCompleteTemplates>
                                 </SfAutoComplete>
+                                <ValidationMessage For="@(() => userDetail.WardId)"></ValidationMessage>
                             </Template>
                         </FormItem>
                         <FormItem Field="@nameof(userDetail.Role)" LabelText="Ủy quyền" ColumnSpan="6" ID="Role">
@@ -188,6 +190,7 @@ else
                                     </DropDownListTemplates>
                                     <DropDownListFieldSettings Text="Name" Value="Name"></DropDownListFieldSettings>
                                 </SfDropDownList>
+                                <ValidationMessage For="@(() => userDetail.Role)"></ValidationMessage>
                             </Template>
                         </FormItem>
                     </FormGroup>
@@ -233,7 +236,7 @@ else
                 Provinces = result.Data.Provinces;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách tỉnh/thành phố");
         }
@@ -409,5 +412,10 @@ else
     .e-avatar.e-avatar-xlarge {
         height: 128px;
         width: 128px;
+    }
+
+    e-ddl.e-lib.e-input-group.e-control-container.e-control-wrapper.e-multi-column.e-success.e-valid-input.modified.valid {
+        align-items: center;
+        padding-left: 8px;
     }
 </style>

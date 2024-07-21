@@ -1,0 +1,327 @@
+﻿@page "/product/create"
+
+@using BaseLibrary.DTOs.Auth
+@using BaseLibrary.Models
+@using Microsoft.AspNetCore.Http
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
+
+<div class="bg-white shadow-lg p-2">
+    <h1 class="text-black
+         fs-5 mb-0">
+        <strong>
+            Thêm sản phẩm mới
+        </strong>
+    </h1>
+</div>
+
+@if (IsLoading == true)
+{
+    <div class="d-flex justify-content-center align-items-center">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
+    </div>
+}
+else
+{
+    <div class="px-4">
+        <SfBreadcrumb class="my-2">
+            <BreadcrumbItems>
+                <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
+                <BreadcrumbItem Text="Sản phẩm" IconCss="bi bi-box-seam-fill" Url="/user"></BreadcrumbItem>
+                <BreadcrumbItem Text="Thêm sản phẩm" IconCss="bi bi-box-arrow-in-down"></BreadcrumbItem>
+            </BreadcrumbItems>
+            <BreadcrumbTemplates>
+                <ItemTemplate>
+                    <SfChip>
+                        <ChipItems>
+                            <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
+                        </ChipItems>
+                    </SfChip>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                    <span class="e-icons e-bullet-arrow"></span>
+                </SeparatorTemplate>
+            </BreadcrumbTemplates>
+        </SfBreadcrumb>
+
+        <SfDataForm ID="CreateProductForm" Model="@productDetail" ButtonsAlignment="FormButtonsAlignment.Center" ColumnCount="2" ColumnSpacing="24px" ValidationDisplayMode="FormValidationDisplay.Tooltip" OnSubmit="@SubmitHandler">
+            <FormValidator>
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+            </FormValidator>
+            <FormItems>
+                <FormGroup LabelText="Ảnh đại diện" ID="product-cover-group">
+                    <FormItem Field="@nameof(productDetail.CoverUrl)" LabelText="Ảnh đại diện">
+                        <Template>
+                            @if (string.IsNullOrEmpty(productDetail.CoverUrl))
+                                {
+                                    <label>Chọn ảnh đại diện</label>
+                                    <SfUploader AutoUpload="true" AllowedExtensions=".png, .jpeg, .webp, .svg, .gif, .bmp, .tiff, .jpg">
+                                        <UploaderEvents ValueChange="@OnUpLoadImages">
+                                        </UploaderEvents>
+                                    </SfUploader>
+                                    <ValidationMessage For="@(() => productDetail.CoverUrl)"></ValidationMessage>
+                                }
+                                else
+                                {
+                                    <div class="img-fluid d-flex flex-row justify-content-center">
+                                        <img src="@productDetail.CoverUrl " alt="User Avatar" style="max-width:50%" />
+                                    </div>
+                                }
+                            </Template>
+                        </FormItem>
+                    </FormGroup>
+                    <FormGroup LabelText="Thông tin sản phầm" ID="product-information-group">
+                        <FormItem Field="@nameof(productDetail.Name)" LabelText="Tên sản phẩm"></FormItem>
+                        <FormItem Field="@nameof(productDetail.CategoryId)">
+                            <Template>
+                                <label class="e-form-label">Danh mục sản phẩm</label>
+                                <SfDropDownList @bind-Value="productDetail.CategoryId" TValue="int" TItem="CategoryItem" Placeholder="Chọn danh mục sản phẩm" DataSource="@Categories">
+                                    <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                                <ValidationMessage For="@(() => productDetail.CategoryId)"></ValidationMessage>
+                            </Template>
+                        </FormItem>
+                        <FormItem Field="@nameof(productDetail.Price)" LabelText="Giá thành"></FormItem>
+                        <FormItem Field="@nameof(productDetail.Discount)" LabelText="Giảm giá"></FormItem>
+                    </FormGroup>
+                    <FormGroup LabelText="Tùy chọn sản phẩm" ID="product-option-group" ColumnSpan="2">
+                        <FormItem Field="@nameof(productDetail.IsFlashSale)" LabelText="Kích hoạt Flash Sale" EditorType="FormEditorType.Switch"></FormItem>
+                        <FormItem Field="@nameof(productDetail.ProductImages)" LabelText="Ảnh sản phẩm">
+                            <Template>
+                                <label>Chọn ảnh sản phẩm</label>
+                                <SfUploader AutoUpload="true" AllowedExtensions=".png, .jpeg, .webp, .svg, .gif, .bmp, .tiff, .jpg">
+                                    <UploaderEvents ValueChange="@OnUploadProductImages">
+                                    </UploaderEvents>
+                                </SfUploader>
+                                <ValidationMessage For="@(() => productDetail.ProductImages)"></ValidationMessage>
+                                @if (ProductImagesUrl is not null && ProductImagesUrl.Any())
+                                {
+                                    <div class="product-images-container row">
+                                        @foreach (var item in ProductImagesUrl)
+                                        {
+                                            <div class="product-image-wrapper col-lg-1 col-md-2 col-sm-4">
+                                                <img src="@item" alt="Product Image" class="img-fluid" />
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </Template>
+                        </FormItem>
+                        <FormItem Field="@nameof(productDetail.ProductOptions)">
+                            <Template>
+                                @foreach (var option in productDetail.ProductOptions)
+                                {
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="e-form-label">Màu sắc</label>
+                                            <SfTextBox @bind-Value="option.Color"></SfTextBox>
+                                            <ValidationMessage For="@(() => option.Color)"></ValidationMessage>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="e-form-label">Kích thước</label>
+                                            <SfTextBox @bind-Value="option.Size"></SfTextBox>
+                                            <ValidationMessage For="@(() => option.Size)"></ValidationMessage>
+                                        </div>
+                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                            <label class="e-form-label">Số lượng</label>
+                                            <SfNumericTextBox @bind-Value="option.Quantity" Format="N0"></SfNumericTextBox>
+                                            <ValidationMessage For="@(() => option.Quantity)"></ValidationMessage>
+                                        </div>
+                                    </div>
+
+                                }
+                                <SfButton OnClick="AddOption" class="mt-4" typeof="button">Thêm tùy chọn</SfButton>
+                                <ValidationMessage For="@(() => productDetail.ProductOptions)"></ValidationMessage>
+                            </Template>
+                        </FormItem>
+                        <FormItem Field="@nameof(productDetail.Description)" LabelText="Mô tả" EditorType="FormEditorType.TextArea"></FormItem>
+                    </FormGroup>
+                </FormItems>
+                <FormButtons>
+                    <SfButton typeof="submit">Thêm sản phẩm</SfButton>
+                </FormButtons>
+            </SfDataForm>
+        </div>
+}
+
+@code {
+    private bool IsLoading = false;
+
+    private List<CategoryItem> Categories { get; set; } = new List<CategoryItem>();
+    private List<ProductItem> Products { get; set; } = new List<ProductItem>();
+
+    private CreateProductDTO productDetail = new();
+    private string[] ProductImagesUrl { get; set; } = [];
+
+    private void AddOption()
+    {
+        productDetail.ProductOptions.Add(new ProductOptionDTO());
+    }
+
+    private async Task OnUploadProductImages(UploadChangeEventArgs args)
+    {
+        try
+        {
+            // Dùng UploadImageAsync thay vì UploadImagesAsync
+            foreach (var file in args.Files)
+            {
+                using (var stream = file.File.OpenReadStream(long.MaxValue))
+                {
+                    var res = await cloudinaryService.UploadImageAsync(stream, file.FileInfo.Name);
+
+                    if (res.Success == false)
+                    {
+                        await DisplayDialog(res.Message, "Lỗi tải ảnh lên máy chủ");
+                    }
+                    else
+                    {
+                        productDetail.ProductImages.Add(new ProductImageDTO()
+                            {
+                                ImageUrl = res.Data
+                            });
+                        // Add to ProductImagesUrl
+                        ProductImagesUrl = productDetail.ProductImages.Select(x => x.ImageUrl).ToArray();
+                    }
+
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayDialog(ex.ToString(), "Lỗi tải ảnh lên máy chủ");
+        }
+    }
+
+    private async Task OnUpLoadImages(UploadChangeEventArgs args)
+    {
+        try
+        {
+            for (int i = 0; i < args.Files.Count; i++)
+            {
+                var file = args.Files[i];
+
+                using (var stream = file.File.OpenReadStream(long.MaxValue))
+                {
+                    var res = await cloudinaryService.UploadImageAsync(stream, file.FileInfo.Name);
+
+                    if (res.Success == false)
+                    {
+                        await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi tải ảnh lên máy chủ");
+                    }
+                    else
+                    {
+                        if (i == 0)
+                        {
+                            productDetail.CoverUrl = res.Data;
+                        };
+                    }
+                }
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi tải ảnh lên máy chủ");
+        }
+    }
+
+    private async void SubmitHandler(EditContext context)
+    {
+        bool isValid = context.Validate();
+
+        if (isValid)
+        {
+            IsLoading = true;
+
+            try
+            {
+                var res = await productService.CreateProduct(productDetail);
+
+                if (res.Flag == true)
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+
+                    NavManager.NavigateTo("/product");
+                }
+                else
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+                }
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi tạo sản phẩm");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        try
+        {
+            ServiceModel<CategoryList> result = await categoryService.GetCategories();
+
+            if (result.Success == true && result.Data is not null)
+            {
+                Categories = result.Data.Categories;
+            }
+            else
+            {
+                await DisplayDialog(result.Message, "Thông báo");
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách danh mục");
+        }
+        try
+        {
+            ServiceModel<ProductList> result = await productService.GetProducts();
+
+            if (result.Success == true && result.Data is not null)
+            {
+                Products = result.Data.Products;
+            }
+            else
+            {
+                await DisplayDialog(result.Message, "Thông báo");
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách sản phẩm");
+        }
+        finally
+        {
+            IsLoading = false;
+            productDetail.ProductImages = new List<ProductImageDTO>();
+            productDetail.ProductOptions = new List<ProductOptionDTO>();
+        }
+    }
+
+    private async Task DisplayDialog(string content, string title)
+    {
+        await DialogService.AlertAsync(content, title);
+    }
+}
+
+<style>
+    .e-bullet-arrow::before {
+        content: '\e763';
+        font-size: 12px;
+    }
+
+    .e-highlight {
+        background-color: yellow;
+    }
+</style>
