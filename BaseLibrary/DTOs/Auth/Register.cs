@@ -30,6 +30,7 @@ namespace BaseLibrary.DTOs.Auth
         // Ảnh đại diện
         public string? Photo { get; set; }
         public string? Other { get; set; } // Thông tin khác
-        public string? Role { get; set; } // Vai trò
+        [Required(ErrorMessage = "Vui lòng chọn vai trò")]
+        public string Role { get; set; } = null!; // Vai trò
     }
 }

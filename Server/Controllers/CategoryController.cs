@@ -14,14 +14,30 @@ namespace Server.Controllers
         public async Task<IActionResult> GetCategories(int? page, int? pageSize)
         {
             var result = await categoryRepo.GetCategories(page, pageSize);
-            return Ok(result);
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategory(int id)
         {
             var result = await categoryRepo.GetCategory(id);
-            return Ok(result);
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpPost]
@@ -29,7 +45,15 @@ namespace Server.Controllers
         public async Task<IActionResult> AddCategory(CreateCategoryDTO category)
         {
             var result = await categoryRepo.AddCategory(category);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpPut("{id}")]
@@ -37,7 +61,15 @@ namespace Server.Controllers
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryDTO category)
         {
             var result = await categoryRepo.UpdateCategory(id, category);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpDelete("{id}")]
@@ -45,7 +77,15 @@ namespace Server.Controllers
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var result = await categoryRepo.DeleteCategory(id);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

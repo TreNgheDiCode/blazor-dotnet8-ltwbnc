@@ -44,7 +44,7 @@ else
             </BreadcrumbTemplates>
         </SfBreadcrumb>
 
-        <SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
+        <SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid" AllowExcelExport="true">
             <GridTemplates>
                 <ToolbarTemplate>
                     <SfToolbar>
@@ -55,6 +55,7 @@ else
                             <ToolbarItem Text="Thêm"></ToolbarItem>
                             <ToolbarItem Text="Cập nhật"></ToolbarItem>
                             <ToolbarItem Text="Xóa"></ToolbarItem>
+                            <ToolbarItem Text="Xuất Excel"></ToolbarItem>
                         </ToolbarItems>
                     </SfToolbar>
                 </ToolbarTemplate>
@@ -70,6 +71,7 @@ else
             <GridEditSettings AllowAdding="true" AllowDeleting="true"></GridEditSettings>
             <GridPageSettings PageSize="5">
             </GridPageSettings>
+            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
             <GridColumns>
                 <GridColumn Field=@nameof(UserItem.Id) HeaderText="Mã người dùng"></GridColumn>
                 <GridColumn Field=@nameof(UserItem.Fullname) HeaderText="Tên người dùng">
@@ -126,7 +128,7 @@ else
     // STT, Tên, Email, Ngày tạo, Khóa, Ủy quyền, Thao tác
     public List<UserItem> Users { get; set; } = new();
     private SfGrid<UserItem> Grid;
-    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa" };
+    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Xuất Excel" };
     private string[] GroupOption = (new string[] { "Id" });
 
     private async void OnLockUser(ChangeEventArgs<bool> args, int id)
@@ -261,6 +263,10 @@ else
                     }
                 }
             }
+        }
+        if (args.Item.Text == "Xuất Excel")
+        {
+            await this.Grid.ExportToExcelAsync();
         }
     }
 

@@ -20,10 +20,16 @@ namespace ServerLibrary.Repositories.Implementations
                 return new GeneralResponse(false, "Danh mục đã tồn tại");
             }
 
+            // Nếu tên danh mục trống
+            if (string.IsNullOrWhiteSpace(category.Name))
+            {
+                return new GeneralResponse(false, "Tên danh mục không được để trống");
+            }
+
             // Tạo danh mục mới
             Category newCategory = new()
             {
-                Name = category.Name
+                Name = category.Name,
             };
 
             // Thêm danh mục mới vào cơ sở dữ liệu
