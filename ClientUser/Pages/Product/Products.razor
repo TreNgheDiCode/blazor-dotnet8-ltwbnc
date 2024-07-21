@@ -1,65 +1,224 @@
 ﻿@page "/"
+@inherits MainLayout
 @using BaseLibrary.DTOs
 @inject HttpClient httpClient
 
+<style>
+    /* styles.css */
 
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
 
+    .product-container {
+        padding: 20px;
+    }
 
+    .product-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        text-align: center;
+    }
 
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12), 0 6px 6px rgba(0, 0, 0, 0.16);
+        }
 
-    @if (loading == true)
-    {   <div class="mt-auto">
-        <button class="btn btn-primary float-start" type="button" disabled>
+        .product-card img {
+            height: 256px;
+            width: 512px;
+            object-fit: cover;
+        }
+
+    .card-title a {
+        font-size: 25px;
+       
+        color: #333;
+        text-decoration: none;
+    }
+
+        .card-title a:hover {
+            color: #007bff;
+        }
+
+    .card-text {
+        color: #666;
+        margin-bottom: 10px;
+        text-align:center;
+    }
+
+    .price {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .view-detail-btn {
+        background-color: #ff5a5f;
+        border: none;
+    }
+
+        .view-detail-btn:hover {
+            background-color: #e04a4e;
+        }
+
+    /* Slider styles */
+    .carousel-item img {
+        max-height: 500px;
+        object-fit: cover;
+    }
+
+    .carousel-caption {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+    }
+
+    /* Center align h2 tags */
+    h2 {
+        text-align: center;
+        margin: 20px 0;
+    }
+</style>
+
+<!-- Slider -->
+<div class="slider-container">
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3000">
+        <ol class="carousel-indicators">
+            <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"></li>
+            <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"></li>
+            <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="banner.jpg" class="d-block w-100" alt="Slide 1">
+                <div class="carousel-caption d-none d-md-block">
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="banner.jpg" class="d-block w-100" alt="Slide 2">
+                <div class="carousel-caption d-none d-md-block">
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="banner.jpg" class="d-block w-100" alt="Slide 3">
+                <div class="carousel-caption d-none d-md-block">
+                </div>
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </a>
+    </div>
+</div>
+
+<h2>DANH SÁCH SẢN PHẨM MỚI NHẤT</h2>
+@if (loading)
+{
+    <div class="loading-spinner">
+        <button class="btn btn-primary" type="button" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Đang tải...
         </button>
-        </div>
-    }
-    else
-    {
-        <div class="col">
-            @if (products != null && products.Products.Any())
-            {
-                <div class="row row-cols-1 row-cols-md-3 g-4">
-                    @foreach (var product in products.Products)
-                    {
-                        <div class="col">
-                            <div class="product-card">
-                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
-                            <div class="card-title"><a href="/products/detail/@product.Id">@product.Name</a></div>
-                            <p class="card-text">@product.Description</p>
-                                <p class="card-text">Số lượng:  @product.ProductOptions.Sum(opt=>opt.Quantity)</p>
-                            <div class="price"  style="color:red">Giá: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
-                            <button class="btn btn-danger" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+    </div>
+}
+else
+{
+    <div class="product-container">
+        @if (products != null && products.Products.Any())
+        {
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var product in products.Products)
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            <div class="card-title">
+                                <a href="/products/detail/@product.Id">@product.Name</a>
                             </div>
+                            <p class="card-text">@product.Description</p>
+                            <p class="card-text">Số lượng: @product.ProductOptions.Sum(opt => opt.Quantity)</p>
+                            <div class="price" style="color:red">Giá: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
+                            <button class="btn btn-danger view-detail-btn" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
                         </div>
-                    }
-                </div>
-            }
-            else
-            {
-                <p class="text-center">No products found.</p>
-            }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No products found.</p>
+        }
+    </div>
+}
 
-        </div>
-    }
+<h2>DANH SÁCH SẢN PHẨM</h2>
+@if (loading)
+{
+    <div class="loading-spinner">
+        <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Đang tải...
+        </button>
+    </div>
+}
+else
+{
+    <div class="product-container">
+        @if (products != null && products.Products.Any())
+        {
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var product in products.Products)
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            <div class="card-title">
+                                <a href="/products/detail/@product.Id">@product.Name</a>
+                            </div>
+                            <p class="card-text">@product.Description</p>
+                            <p class="card-text">Số lượng: @product.ProductOptions.Sum(opt => opt.Quantity)</p>
+                            <div class="price" style="color:red">Giá: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
+                            <button class="btn btn-danger view-detail-btn" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No products found.</p>
+        }
+    </div>
+}
 
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
 
 @code {
     private ProductList? products;
     public bool loading = false;
+
     protected override async Task OnInitializedAsync()
     {
         loading = true;
         ServiceModel<ProductList> result = await productService.GetProducts();
         if (result.Success == true)
         {
-
             products = result.Data;
-            loading = false;
         }
+        loading = false;
     }
+
     private void NavigateToProductDetail(int productId)
     {
         NavigationManager.NavigateTo($"/products/detail/{productId}");

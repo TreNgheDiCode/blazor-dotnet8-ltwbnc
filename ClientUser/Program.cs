@@ -1,4 +1,4 @@
-using BaseLibrary.Helpers;
+﻿using BaseLibrary.Helpers;
 using BaseLibrary.Helpers.Client;
 using Blazored.LocalStorage;
 using ClientUser;
@@ -23,7 +23,7 @@ builder.Services.AddTransient<CustomHttpHandler>();
 builder.Services.AddHttpClient("SystemApiClient", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7016");
-    client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*"); // Th�m header n�y n?u c?n thi?t
+    client.DefaultRequestHeaders.Add("Access-Control-Allow-Origin", "*"); // Thêm header này nếu cần thiết
 }).AddHttpMessageHandler<CustomHttpHandler>();
 
 builder.Services.AddAuthorizationCore();
@@ -36,7 +36,6 @@ builder.Services.AddScoped<IProductsService, ProductsService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<CartService>();
-
 
 // Syncfusion
 builder.Services.Configure<SyncfusionSection>(builder.Configuration.GetSection("Syncfusion"));
