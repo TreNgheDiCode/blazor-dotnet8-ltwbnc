@@ -1,7 +1,5 @@
 ﻿@page "/category/{CategoryName}"
 <style>
-    /* styles.css */
-
     .loading-spinner {
         display: flex;
         justify-content: center;
@@ -79,8 +77,116 @@
         text-align: center;
         margin: 20px 0;
     }
+
+    .category-item {
+        margin-right: 20px;
+    }
+
+        .category-item a {
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            transition: color 0.3s ease;
+            padding: 5px 15px;
+            border-radius: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+            .category-item a:hover {
+                background-color: #28a745; /* Green color */
+                color: #fff;
+            }
+
+    .list-group-horizontal {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .category {
+        background-color: #f8f9fa;
+        padding: 15px 0;
+        border-bottom: 2px solid #28a745;
+    }
+
+    .col {
+        text-align: center;
+    }
+
+    /* Dropdown Button */
+    .dropdown-toggle {
+        border: 2px solid #28a745;
+        padding: 10px 15px;
+        border-radius: 5px;
+        color: #28a745;
+        font-weight: bold;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .dropdown-toggle:hover {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+    /* Dropdown Menu */
+    .dropdown-menu {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+    }
+
+    .dropdown-item-text {
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .dropdown-item-text a {
+            text-decoration: none;
+            color: #28a745; /* Green color */
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-item-text:hover {
+            background-color: #28a745; /* Green color */
+            color: #fff;
+            border-radius: 5px;
+        }
+
+            .dropdown-item-text:hover a {
+                color: #fff;
+            }
+
+    /* Align icon and text in the dropdown toggle button */
+    .dropdown-toggle img {
+        height: 20px; /* Adjust size of the icon as necessary */
+    }
 </style>
-<h2>DANH SÁCH SẢN PHẨM MỚI NHẤT</h2>
+
+<div class="category-item dropdown">
+    <a class="dropdown-toggle" data-bs-toggle="dropdown">Danh Mục</a>
+    @if (cate != null)
+    {
+        <ul class="dropdown-menu show">
+            @foreach (var item in cate.Categories)
+            {
+                <li class="dropdown-item-text "><a href="/category/@item.Name">@item.Name</a></li>
+            }
+        </ul>
+    }
+</div>
+<h2>DANH SÁCH SẢN PHẨM</h2>
 @if (loading)
 {
     <div class="loading-spinner">
@@ -92,6 +198,8 @@
 }
 else
 {
+    
+
     <div class="product-container">
         @if (products != null && products.Any())
         {
@@ -115,7 +223,7 @@ else
         }
         else
         {
-            <p class="text-center">No products found.</p>
+            <p class="text-center">Không có sản phẩm nào!.</p>
         }
     </div>
 }
@@ -125,12 +233,30 @@ else
     public string? Categoryname { get; set; } // Thêm thuộc tính này
     private bool loading = false;
     private List<ProductItem>? products;
+    private CategoryList? cate; 
 
     protected override async Task OnParametersSetAsync()
     {
         await LoadProducts();
+        await categoty();
     }
 
+    private async Task categoty()
+    {
+        // Thêm console log để kiểm tra dữ liệu trả về
+        Console.WriteLine("Fetching categories...");
+
+        ServiceModel<CategoryList> result = await categoryService.GetCategories(1, 1);
+        if (result.Success == true)
+        {
+            cate = result.Data;
+            Console.WriteLine("đã tìm thấy danh mục");
+        }
+        else
+        {
+            Console.WriteLine("không tìm thấy danh mục");
+        }
+    }
     private async Task LoadProducts()
     {
         loading = true;
@@ -147,4 +273,6 @@ else
     {
         NavigationManager.NavigateTo($"/products/detail/{productId}");
     }
+
+    
 }
