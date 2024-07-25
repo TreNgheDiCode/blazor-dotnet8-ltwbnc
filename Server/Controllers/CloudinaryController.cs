@@ -60,5 +60,20 @@ namespace Server.Controllers
                 return BadRequest(result);
             }
         }
+
+        [HttpDelete("{publicId}")]
+        public async Task<IActionResult> DeleteImage(string publicId)
+        {
+            var result = await cloudinaryRepo.DeleteImageAsync(publicId);
+
+            if (result.Flag == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
     }
 }

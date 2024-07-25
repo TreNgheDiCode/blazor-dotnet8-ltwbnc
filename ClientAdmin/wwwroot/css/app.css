@@ -113,17 +113,3 @@ a, .btn-link {
 code {
     color: #c02d76;
 }
-
-@media (min-width: 768px) {
-    .product-image-wrapper {
-        flex: 1 0 calc(100% / 6 - 10px);
-        max-width: calc(100% / 6 - 10px);
-    }
-}
-
-@media (min-width: 992px) {
-    .product-image-wrapper {
-        flex: 1 0 calc(100% / 12 - 10px);
-        max-width: calc(100% / 12 - 10px);
-    }
-}

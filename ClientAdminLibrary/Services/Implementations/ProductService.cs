@@ -10,6 +10,26 @@ namespace ClientAdminLibrary.Services.Implementations
     {
         public const string ProductUrl = "api/products";
 
+        public async Task<GeneralResponse> AddProductImage(int id, List<ProductImageDTO> productImages)
+        {
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PostAsJsonAsync($"{ProductUrl}/{id}/images", productImages);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Thêm ảnh sản phẩm thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Thêm ảnh sản phẩm thất bại");
+            }
+        }
+
         public async Task<GeneralResponse> CreateProduct(CreateProductDTO product)
         {
             var client = await httpClient.GetPrivateHttpClient();
@@ -47,6 +67,46 @@ namespace ClientAdminLibrary.Services.Implementations
                 var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
 
                 return errorResponse ?? new GeneralResponse(false, "Xóa sản phẩm thất bại");
+            }
+        }
+
+        public async Task<GeneralResponse> DeleteProductImage(int productId, int imageId)
+        {
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.DeleteAsync($"{ProductUrl}/{productId}/images/{imageId}");
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Xóa ảnh sản phẩm thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Xóa ảnh sản phẩm thất bại");
+            }
+        }
+
+        public async Task<GeneralResponse> DeleteProductOption(int productId, int optionId)
+        {
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.DeleteAsync($"{ProductUrl}/{productId}/options/{optionId}");
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Xóa tùy chọn sản phẩm thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Xóa tùy chọn sản phẩm thất bại");
             }
         }
 
