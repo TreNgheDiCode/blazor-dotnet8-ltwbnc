@@ -102,11 +102,12 @@ else
                                 <ValidationMessage For="@(() => productDetail.ProductImages)"></ValidationMessage>
                                 @if (ProductImagesUrl is not null && ProductImagesUrl.Any())
                                 {
-                                    <div class="product-images-container row">
+                                    <div class="row gap-4">
                                         @foreach (var item in ProductImagesUrl)
                                         {
-                                            <div class="product-image-wrapper col-lg-1 col-md-2 col-sm-4">
+                                            <div class="px-0 mt-4 col-lg-3 col-md-4 col-sm-6 position-relative">
                                                 <img src="@item" alt="Product Image" class="img-fluid" />
+                                                <button type="button" class="btn-remove" @onclick="@(() => RemoveImage(item))">X</button>
                                             </div>
                                         }
                                     </div>
@@ -118,25 +119,28 @@ else
                                 @foreach (var option in productDetail.ProductOptions)
                                 {
                                     <div class="row">
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
                                             <label class="e-form-label">Màu sắc</label>
                                             <SfTextBox @bind-Value="option.Color"></SfTextBox>
                                             <ValidationMessage For="@(() => option.Color)"></ValidationMessage>
                                         </div>
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
                                             <label class="e-form-label">Kích thước</label>
                                             <SfTextBox @bind-Value="option.Size"></SfTextBox>
                                             <ValidationMessage For="@(() => option.Size)"></ValidationMessage>
                                         </div>
-                                        <div class="col-lg-4 col-md-6 col-sm-12">
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
                                             <label class="e-form-label">Số lượng</label>
                                             <SfNumericTextBox @bind-Value="option.Quantity" Format="N0"></SfNumericTextBox>
                                             <ValidationMessage For="@(() => option.Quantity)"></ValidationMessage>
                                         </div>
+                                        <div class="d-flex flex-column justify-content-between col-lg-3 col-md-4 col-sm-6">
+                                            <label class="e-form-label">Tùy chọn</label>
+                                            <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => RemoveOption(option.Id))">Xóa</button>
+                                        </div>
                                     </div>
-
                                 }
-                                <SfButton OnClick="AddOption" class="mt-4" typeof="button">Thêm tùy chọn</SfButton>
+                                <SfButton OnClick="AddOption" class="mt-4" type="button">Thêm tùy chọn</SfButton>
                                 <ValidationMessage For="@(() => productDetail.ProductOptions)"></ValidationMessage>
                             </Template>
                         </FormItem>
@@ -144,7 +148,7 @@ else
                     </FormGroup>
                 </FormItems>
                 <FormButtons>
-                    <SfButton typeof="submit">Thêm sản phẩm</SfButton>
+                    <SfButton typeof="submit" CssClass="mb-4">Thêm sản phẩm</SfButton>
                 </FormButtons>
             </SfDataForm>
         </div>
@@ -158,10 +162,21 @@ else
     private CreateProductDTO productDetail = new();
     private string[] ProductImagesUrl { get; set; } = [];
 
+    private void RemoveOption(int id)
+    {
+        productDetail.ProductOptions.RemoveAll(x => x.Id == id);
+    }
+
     private void AddOption()
     {
         productDetail.ProductOptions.Add(new ProductOptionDTO());
         return;
+    }
+
+    private async Task RemoveImage(string imageUrl)
+    {
+        productDetail.ProductImages.RemoveAll(x => x.ImageUrl == imageUrl);
+        ProductImagesUrl = productDetail.ProductImages.Select(x => x.ImageUrl).ToArray();
     }
 
     private async Task OnUploadProductImages(UploadChangeEventArgs args)

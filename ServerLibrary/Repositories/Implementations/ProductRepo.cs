@@ -83,16 +83,20 @@ namespace ServerLibrary.Repositories.Implementations
 
             // Lấy sản phẩm theo ID
             Product? product = await context.Products.FindAsync(id);
+
             if (product == null)
             {
                 return new GeneralResponse(false, "Không tìm thấy sản phẩm");
             }
 
-            // Thêm hình ảnh vào sản phẩm
-            product.ProductImages.AddRange(productImages.Select(pi => new ProductImage
-            {
-                Url = pi.ImageUrl
-            }));
+            product.ProductImages =
+            [
+                // Cập nhật danh sách hình ảnh sản phẩm
+                .. productImages.Select(pi => new ProductImage
+                {
+                    Url = pi.ImageUrl
+                }),
+            ];
 
             // Lưu thay đổi vào cơ sở dữ liệu
             await context.SaveChangesAsync();
@@ -259,10 +263,12 @@ namespace ServerLibrary.Repositories.Implementations
                     CategoryName = p.Category!.Name,
                     ProductImages = p.ProductImages.Select(pi => new ProductImageDTO
                     {
+                        Id = pi.Id,
                         ImageUrl = pi.Url
                     }).ToList(),
                     ProductOptions = p.ProductOptions.Select(po => new ProductOptionDTO
                     {
+                        Id = po.Id,
                         Color = po.Color,
                         Size = po.Size,
                         Quantity = po.Quantity
@@ -342,10 +348,12 @@ namespace ServerLibrary.Repositories.Implementations
                     CategoryName = p.Category!.Name,
                     ProductImages = p.ProductImages.Select(pi => new ProductImageDTO
                     {
+                        Id = pi.Id,
                         ImageUrl = pi.Url
                     }).ToList(),
                     ProductOptions = p.ProductOptions.Select(po => new ProductOptionDTO
                     {
+                        Id = po.Id,
                         Color = po.Color,
                         Size = po.Size,
                         Quantity = po.Quantity
@@ -396,7 +404,7 @@ namespace ServerLibrary.Repositories.Implementations
             };
         }
 
-        public async Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO product)
+        public async Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO data)
         {
             // Kiểm tra danh sách danh mục trong cơ sở dữ liệu không rỗng
             if (!await context.Categories.AnyAsync())
@@ -405,7 +413,7 @@ namespace ServerLibrary.Repositories.Implementations
             }
 
             // Lấy sản phẩm theo ID
-            Product? productToUpdate = await context.Products.FindAsync(id);
+            Product? productToUpdate = await context.Products.Include(p => p.ProductImages).Include(p => p.ProductOptions).FirstOrDefaultAsync(p => p.Id == id);
 
             // Nếu không tìm thấy sản phẩm
             if (productToUpdate == null)
@@ -414,7 +422,7 @@ namespace ServerLibrary.Repositories.Implementations
             }
 
             // Kiểm tra danh mục có tồn tại không
-            bool isCategoryExist = await context.Categories.AnyAsync(c => c.Id == product.CategoryId);
+            bool isCategoryExist = await context.Categories.AnyAsync(c => c.Id == data.CategoryId);
 
             // Nếu danh mục không tồn tại
             if (!isCategoryExist)
@@ -423,37 +431,69 @@ namespace ServerLibrary.Repositories.Implementations
             }
 
             // Kiểm tra xem sản phẩm đã tồn tại với danh mục đó chưa
-            bool isExist = await context.Products.AnyAsync(p => p.Name == product.Name && p.CategoryId == product.CategoryId);
-
-            // Nếu sản phẩm đã tồn tại với danh mục đó
-            if (isExist)
+            if (data.Name != productToUpdate.Name || data.CategoryId != productToUpdate.CategoryId)
             {
-                return new GeneralResponse(false, "Sản phẩm với tên này đã tồn tại trong cùng danh mục");
+                bool isExist = await context.Products.AnyAsync(p => p.Name == data.Name && p.CategoryId == data.CategoryId);
+
+                // Nếu sản phẩm đã tồn tại với danh mục đó
+                if (isExist)
+                {
+                    return new GeneralResponse(false, "Sản phẩm với tên này đã tồn tại trong cùng danh mục");
+                }
             }
 
             // Cập nhật thông tin sản phẩm
-            productToUpdate.Name = product.Name;
-            productToUpdate.Description = product.Description;
-            productToUpdate.Price = product.Price;
-            productToUpdate.Discount = product.Discount;
-            productToUpdate.Status = product.Status;
-            productToUpdate.CategoryId = product.CategoryId;
-            productToUpdate.ProductImages = product.ProductImages.Select(pi => new ProductImage
+            productToUpdate.Name = data.Name;
+            productToUpdate.Description = data.Description;
+            productToUpdate.Price = data.Price;
+            productToUpdate.Discount = data.Discount;
+            productToUpdate.Status = data.Status;
+            productToUpdate.CategoryId = data.CategoryId;
+
+            // Nếu danh sách hình ảnh sản phẩm thay đổi thì mới cập nhật
+            if (data.ProductImages != null)
             {
-                Url = pi.ImageUrl
-            }).ToList();
-            productToUpdate.ProductOptions = product.ProductOptions.Select(po => new ProductOption
+                // Remove all old product images
+                context.ProductImages.RemoveRange(productToUpdate.ProductImages);
+
+                // Add new product images
+                foreach (var pi in data.ProductImages)
+                {
+                    productToUpdate.ProductImages.Add(new ProductImage
+                    {
+                        Url = pi.ImageUrl
+                    });
+                }
+            }
+
+            // Nếu danh sách tùy chọn sản phẩm thay đổi thì mới cập nhật
+            if (data.ProductOptions != null)
             {
-                Color = po.Color,
-                Size = po.Size,
-                Quantity = po.Quantity
-            }).ToList();
+                // Remove all old product options
+                context.ProductOptions.RemoveRange(productToUpdate.ProductOptions);
+
+                // Add new product options
+                foreach (var po in data.ProductOptions)
+                {
+                    productToUpdate.ProductOptions.Add(new ProductOption
+                    {
+                        Color = po.Color,
+                        Size = po.Size,
+                        Quantity = po.Quantity
+                    });
+                }
+            }
 
             // Lưu thay đổi vào cơ sở dữ liệu
-            await context.SaveChangesAsync();
+            int res = await context.SaveChangesAsync();
 
-            // Trả về thông báo thành công
-            return new GeneralResponse(true, "Cập nhật sản phẩm thành công");
+            if (res > 0)
+            {
+                return new GeneralResponse(true, "Cập nhật sản phẩm thành công");
+            }
+
+            // Trả về thông báo lỗi nếu cập nhật không thành công
+            return new GeneralResponse(false, "Cập nhật sản phẩm không thành công");
         }
 
         public async Task<GeneralResponse> UpdateProductImage(int productId, int imageId, string imageUrl)

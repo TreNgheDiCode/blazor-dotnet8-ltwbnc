@@ -81,8 +81,6 @@ namespace BaseLibrary.DTOs
         [Required(ErrorMessage = "Danh mục không được để trống")]
         [Range(1, int.MaxValue, ErrorMessage = "Danh mục không hợp lệ")]
         public int CategoryId { get; set; } // ID danh mục
-        [Required(ErrorMessage = "Hình ảnh sản phẩm không được để trống")]
-        [MinLength(1, ErrorMessage = "Hình ảnh sản phẩm phải ít nhất 1")]
         public List<ProductImageDTO>? ProductImages { get; set; } // Danh sách hình ảnh sản phẩm
         [Required(ErrorMessage = "Tùy chọn sản phẩm không được để trống")]
         [MinLength(1, ErrorMessage = "Tùy chọn sản phẩm phải ít nhất 1")]
@@ -91,11 +89,14 @@ namespace BaseLibrary.DTOs
 
     public record ProductImageDTO
     {
-        public string? ImageUrl { get; set; } // Đường dẫn hình ảnh
+        public int Id { get; set; } // ID hình ảnh
+        [Required(ErrorMessage = "Đường dẫn hình ảnh không được để trống")]
+        public string ImageUrl { get; set; } = null!; // Đường dẫn hình ảnh
     }
 
     public record ProductOptionDTO
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "Màu sắc không được để trống")]
         public string? Color { get; set; } // Màu sắc
         [Required(ErrorMessage = "Kích thước không được để trống")]

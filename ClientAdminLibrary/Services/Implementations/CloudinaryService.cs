@@ -1,5 +1,6 @@
 ﻿using BaseLibrary.DTOs;
 using BaseLibrary.Helpers.Client;
+using BaseLibrary.Responses;
 using ClientAdminLibrary.Services.Contracts;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http.Json;
@@ -82,6 +83,23 @@ namespace ClientAdminLibrary.Services.Implementations
                     Message = "Lỗi máy chủ",
                     Success = false
                 };
+            }
+        }
+
+        public async Task<GeneralResponse> DeleteImageAsync(string publicId)
+        {
+            var client = httpClient.GetPublicHttpClient();
+            var result = await client.DeleteAsync($"{CloudinaryUrl}/{publicId}");
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+                return successResponse ?? new GeneralResponse(true, "Xóa hình ảnh thành công");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+                return errorResponse ?? new GeneralResponse(false, "Xóa hình ảnh thất bại");
             }
         }
     }
