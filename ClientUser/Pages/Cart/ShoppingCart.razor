@@ -186,7 +186,15 @@ body {
 
     <div class="checkout-summary">
         <div class="total-amount">
-            Tổng giá trị đơn hàng: @string.Format("{0:0,0 đồng}", cartItems.Sum(item => item.productItem.Price * item.Quantity))
+            @if (cartItems.Sum(item => item.productItem.Price * item.Quantity)==0)
+            {
+                <p>Tổng giá trị đơn hàng: @string.Format("{0:0 đồng}", cartItems.Sum(item => item.productItem.Price * item.Quantity))</p>
+            }
+            else
+            {
+               <p>Tổng giá trị đơn hàng: @string.Format("{0:0,0 đồng}", cartItems.Sum(item => item.productItem.Price * item.Quantity))</p>
+            }
+            
         </div>
         <button @onclick="ContinuedShopping" class="checkout-btn">TIẾP TỤC MUA SẮM</button>
         <button @onclick="ProceedToCheckout" class="checkout-btn">TIẾP TỤC THANH TOÁN</button>

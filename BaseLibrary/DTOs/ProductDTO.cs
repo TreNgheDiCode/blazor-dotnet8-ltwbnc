@@ -26,6 +26,8 @@ namespace BaseLibrary.DTOs
         public List<ProductImageDTO> ProductImages { get; set; } = []; // Danh sách hình ảnh sản phẩm
         public List<ProductOptionDTO> ProductOptions { get; set; } = []; // Danh sách tùy chọn sản phẩm
         public List<ProductItemReview>? ProductReviews { get; set; } // Danh sách đánh giá
+
+       
     }
 
     public record ProductItemImage

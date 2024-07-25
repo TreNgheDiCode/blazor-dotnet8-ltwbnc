@@ -1,5 +1,83 @@
 ﻿@inherits LayoutComponentBase
 
+<style>
+    .dropdown-menu {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 10px 0;
+    }
+
+    .dropdown-item-text {
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 500;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+        .dropdown-item-text a {
+            text-decoration: none;
+            color: #28a745; /* Green color */
+            transition: color 0.3s ease;
+        }
+
+        .dropdown-item-text:hover {
+            background-color: #28a745; /* Green color */
+            color: #fff;
+            border-radius: 5px;
+        }
+
+            .dropdown-item-text:hover a {
+                color: #fff;
+            }
+
+    .category-item {
+        margin-right: 20px;
+    }
+
+        .category-item a {
+            text-decoration: none;
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            transition: color 0.3s ease;
+            padding: 5px 15px;
+            border-radius: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+            .category-item a:hover {
+                background-color: #28a745; /* Green color */
+                color: #fff;
+            }
+
+    .list-group-horizontal {
+        align-items: center;
+        justify-content: center;
+    }
+
+    .category {
+        background-color: #f8f9fa;
+        padding: 15px 0;
+        border-bottom: 2px solid #28a745;
+    }
+
+    .col {
+        text-align: center;
+    }
+
+    /* Additional Styles */
+    .dropdown-item-text {
+        margin: 5px 0;
+    }
+</style>
+
 <div class="row category">
     <div class="col">
         <div class="list-group list-group-horizontal">
@@ -11,7 +89,7 @@
                     <ul class="dropdown-menu show">
                         @foreach (var item in cate.Categories)
                         {
-                            <li class="dropdown-item"><a href="/category/@item.Name">@item.Name</a></li>
+                            <li class="dropdown-item-text "><a href="/category/@item.Name">@item.Name</a></li>
                         }
                     </ul>
                 }
@@ -34,11 +112,11 @@
         if (result.Success == true)
         {
             cate = result.Data;
-            Console.WriteLine("Categories fetched successfully");
+            Console.WriteLine("đã tìm thấy danh mục");
         }
         else
         {
-            Console.WriteLine("Failed to fetch categories");
+            Console.WriteLine("không tìm thấy danh mục");
         }
     }
 }

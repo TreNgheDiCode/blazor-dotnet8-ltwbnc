@@ -126,7 +126,14 @@ else
                 {
                     <div class="col">
                         <div class="product-card">
-                            <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            @if (product.ProductImages != null && product.ProductImages.Count > 0 && product.ProductImages[0].ImageUrl != null)
+                            {
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            else
+                            {
+                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                            }
                             <div class="card-body">
                                 <h5 class="card-title">
                                     <a href="/products/detail/@product.Id" class="text-decoration-none text-dark">@product.Name</a>
@@ -144,7 +151,7 @@ else
         }
         else
         {
-            <p class="text-center mt-4">No products found.</p>
+            <p class="text-center mt-4">Không có sản phẩm nào!!</p>
         }
     </div>
 }
