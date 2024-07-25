@@ -59,6 +59,16 @@
         margin-bottom: 20px;
     }
 
+    .original-price {
+        text-decoration: line-through;
+        color: red;
+        margin-right: 10px;
+    }
+
+    .discounted-price {
+        color: green;
+    }
+
     .product-details {
         margin-bottom: 20px;
         line-height: 1.6;
@@ -198,7 +208,6 @@
         }
 
 </style>
-
 @if (loading)
 {
     <div class="mt-auto text-center">
@@ -222,7 +231,14 @@ else
 
         <div class="product-page">
             <div class="product-image">
-                <img src="@products.ProductImages[0].ImageUrl" class="img-fluid" alt="Product Image">
+                @if (products.ProductImages != null && products.ProductImages.Count > 0 && products.ProductImages[0].ImageUrl != null)
+                {
+                    <img src="@products.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                }
+                else
+                {
+                    <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                }
             </div>
             <div class="product-info">
                 <h3 class="product-title">@products.Name</h3>
@@ -233,7 +249,17 @@ else
                     <span>⭐</span>
                     <span></span>
                 </div>
-                <div class="product-price">@string.Format("{0:0,0 đồng}", products.Price)</div>
+                <div class="product-price">
+                    @if (products.IsFlashSale && products.Discount.HasValue && products.Discount.Value > 0)
+                    {
+                        <span class="original-price">@string.Format("{0:0,0 đồng}", products.Price)</span>
+                        <span class="discounted-price">@string.Format("{0:0,0 đồng}", products.Price * (1 - (products.Discount.Value / 100.0)))</span>
+                    }
+                    else
+                    {
+                        <span>@string.Format("{0:0,0 đồng}", products.Price)</span>
+                    }
+                </div>
                 <div class="product-details">@products.Description</div>
                 <div class="product-details">Số Lượng: Số Lượng: @selectedQuantity Sản phẩm</div>
                 <div class="product-variations">
@@ -254,7 +280,7 @@ else
                         }
                     </select>
                 </div>
-                
+
                 <div class="product-actions">
                     <button class="add-to-cart" @onclick="AddToCart">Thêm vào Giỏ Hàng</button>
                     <button class="wishlist">Yêu Thích</button>
@@ -266,6 +292,8 @@ else
     {
         <p>No products found.</p>
     }
+}
+
 }
 
 @code {
@@ -290,7 +318,7 @@ else
         try
         {
             var result = await productService.GetProduct(ProductId);
-            if (result.Success ==true && result.Data?.Id != null)
+            if (result.Success == true && result.Data?.Id != null)
             {
                 products = result.Data;
                 selectedSize = products.ProductOptions.FirstOrDefault()?.Size ?? string.Empty;
@@ -316,11 +344,17 @@ else
     {
         if (products != null && selectedQuantity > 0) // Kiểm tra nếu sản phẩm không null và số lượng lớn hơn 0
         {
+            double? finalPrice = products.Price;
+            if (products.IsFlashSale && products.Discount.HasValue && products.Discount.Value > 0)
+            {
+                finalPrice = products.Price * (1 - (products.Discount.Value / 100.0));
+            }
+
             product = new ProductCartItem
                 {
                     Id = products.Id,
                     Name = products.Name,
-                    Price = products.Price,
+                    Price = finalPrice,
                     Description = products.Description,
                     Discount = products.Discount,
                     IsFlashSale = products.IsFlashSale,

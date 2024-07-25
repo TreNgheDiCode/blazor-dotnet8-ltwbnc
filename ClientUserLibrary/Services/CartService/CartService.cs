@@ -38,6 +38,7 @@ namespace ClientUserLibrary.Services.CartService
             OnCartChanged?.Invoke();
         }
 
+
         public async Task RemoveItemFromCart(ProductCartItem product)
         {
             var cart = await _localStorage.GetItemAsync<List<CartLine>>(CartKey) ?? new List<CartLine>();

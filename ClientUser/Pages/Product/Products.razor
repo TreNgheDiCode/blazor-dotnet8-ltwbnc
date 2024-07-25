@@ -5,7 +5,6 @@
 
 <style>
     /* styles.css */
-
     .loading-spinner {
         display: flex;
         justify-content: center;
@@ -39,7 +38,6 @@
 
     .card-title a {
         font-size: 25px;
-       
         color: #333;
         text-decoration: none;
     }
@@ -51,13 +49,25 @@
     .card-text {
         color: #666;
         margin-bottom: 10px;
-        text-align:center;
+        text-align: center;
     }
 
+    
+    /* styles.css */
     .price {
         font-size: 1.1rem;
         font-weight: bold;
     }
+
+        .price .original-price {
+            text-decoration: line-through;
+            color: red;
+            margin-right: 10px;
+        }
+
+        .price .discounted-price {
+            color: green;
+        }
 
     .view-detail-btn {
         background-color: #ff5a5f;
@@ -128,6 +138,56 @@
     <img src="images/img_1.png" class="img-fluid" alt="New Image">
 </div>
 
+<h2>DANH SÁCH SẢN PHẨM FLASH SALE</h2>
+@if (loading)
+{
+    <div class="loading-spinner">
+        <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Đang tải...
+        </button>
+    </div>
+}
+else
+{
+    <div class="product-container">
+        @if (products != null && products.Products.Any(p => p.IsFlashSale))
+        {
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var product in products.Products.Where(p => p.IsFlashSale))
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            @if (product.ProductImages != null && product.ProductImages.Count > 0 && product.ProductImages[0].ImageUrl != null)
+                            {
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            else
+                            {
+                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            <div class="card-title">
+                                <a href="/products/detail/@product.Id">@product.Name</a>
+                            </div>
+                            <p class="card-text">@product.Description</p>
+                            <p class="card-text">Số lượng: @product.ProductOptions.Sum(opt => opt.Quantity)</p>
+                            <div class="price">
+                                <span class="original-price">@string.Format("{0:0,0 đồng}", product.Price)</span>
+                                <span class="discounted-price">@string.Format("{0:0,0 đồng}", product.Price * (1 - (product.Discount ?? 0) / 100.0))</span>
+                            </div>
+                            <button class="btn btn-danger view-detail-btn" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center">No flash sale products found.</p>
+        }
+    </div>
+}
+    
 <h2>DANH SÁCH SẢN PHẨM MỚI NHẤT</h2>
 @if (loading)
 {
@@ -141,6 +201,7 @@
 else
 {
     <div class="product-container">
+    
         @if (products != null && products.Products.Any())
         {
             <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -148,7 +209,14 @@ else
                 {
                     <div class="col">
                         <div class="product-card">
-                            <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            @if (product.ProductImages != null && product.ProductImages.Count > 0 && product.ProductImages[0].ImageUrl != null)
+                            {
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            else
+                            {
+                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                            }
                             <div class="card-title">
                                 <a href="/products/detail/@product.Id">@product.Name</a>
                             </div>
@@ -163,8 +231,9 @@ else
         }
         else
         {
-            <p class="text-center">No products found.</p>
+            <p class="text-center">Không tìm thấy sản phẩm.</p>
         }
+    
     </div>
 }
 
@@ -181,6 +250,7 @@ else
 else
 {
     <div class="product-container">
+        
         @if (products != null && products.Products.Any())
         {
             <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -188,7 +258,14 @@ else
                 {
                     <div class="col">
                         <div class="product-card">
-                            <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            @if (product.ProductImages != null && product.ProductImages.Count > 0 && product.ProductImages[0].ImageUrl != null)
+                            {
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            else
+                            {
+                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                            }
                             <div class="card-title">
                                 <a href="/products/detail/@product.Id">@product.Name</a>
                             </div>
@@ -203,8 +280,10 @@ else
         }
         else
         {
-            <p class="text-center">No products found.</p>
+            <p class="text-center">Không tìm thấy sản phẩm.</p>
         }
+        
+
     </div>
     <!-- Additional Slider with 5 Images -->
     <div class="slider-container mt-5">
@@ -261,6 +340,7 @@ else
 @code {
     private ProductList? products;
     public bool loading = false;
+    private bool isFlashSale = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -269,6 +349,7 @@ else
         if (result.Success == true)
         {
             products = result.Data;
+            isFlashSale=result.Data.Products.Any(p => p.IsFlashSale);
         }
         loading = false;
     }

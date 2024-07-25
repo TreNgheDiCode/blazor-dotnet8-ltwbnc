@@ -208,7 +208,14 @@ else
                 {
                     <div class="col">
                         <div class="product-card">
-                            <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            @if (product.ProductImages != null && product.ProductImages.Count > 0 && product.ProductImages[0].ImageUrl != null)
+                            {
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            else
+                            {
+                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                            }
                             <div class="card-title">
                                 <a href="/products/detail/@product.Id">@product.Name</a>
                             </div>
