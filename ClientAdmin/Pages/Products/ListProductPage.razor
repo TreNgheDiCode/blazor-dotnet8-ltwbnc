@@ -1,62 +1,167 @@
 ﻿@page "/product"
 
+@using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
 
-<SfGrid DataSource="@Products" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
-    <GridTemplates>
-        <ToolbarTemplate>
-            <SfToolbar>
-                <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
-                <ToolbarItems>
-                    <div class="d-flex flex-column">
-                        <div>
+
+<div class="bg-white shadow-lg p-2">
+    <h1 class="text-black
+         fs-5 mb-0">
+        <strong>
+            Quản lý sản phẩm
+        </strong>
+    </h1>
+</div>
+
+@if (IsLoading == true)
+{
+    <div id="container">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
+    </div>
+}
+else
+{
+    <div class="px-4">
+        <SfBreadcrumb class="my-2">
+            <BreadcrumbItems>
+                <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
+                <BreadcrumbItem Text="Sản phẩm" IconCss="bi bi-box-seam-fill"></BreadcrumbItem>
+                <BreadcrumbItem Text="Danh sách sản phẩm" IconCss="bi bi-box"></BreadcrumbItem>
+            </BreadcrumbItems>
+            <BreadcrumbTemplates>
+                <ItemTemplate>
+                    <SfChip>
+                        <ChipItems>
+                            <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
+                        </ChipItems>
+                    </SfChip>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                    <span class="e-icons e-bullet-arrow"></span>
+                </SeparatorTemplate>
+            </BreadcrumbTemplates>
+        </SfBreadcrumb>
+
+        <SfGrid DataSource="@Products" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid" AllowExcelExport="true">
+            <GridTemplates>
+                <ToolbarTemplate>
+                    <SfToolbar>
+                        <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
+                        <ToolbarItems>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
                             <ToolbarItem Text="Thêm"></ToolbarItem>
                             <ToolbarItem Text="Cập nhật"></ToolbarItem>
                             <ToolbarItem Text="Xóa"></ToolbarItem>
-                            <ToolbarItem Text="Sửa"></ToolbarItem>
-                            <ToolbarItem Text="Hủy"></ToolbarItem>
-                        </div>
-                        <div>
-                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
-                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
-                        </div>
-                    </div>
-                </ToolbarItems>
-            </SfToolbar>
-        </ToolbarTemplate>
-    </GridTemplates>
-    <GridGroupSettings Columns=@GroupOption>
-        <CaptionTemplate>
-            @{
-                var data = (context as CaptionTemplateContext);
-                <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
-            }
-        </CaptionTemplate>
-    </GridGroupSettings>
-    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
-    <GridPageSettings PageSize="5">
-    </GridPageSettings>
-    <GridColumns>
-        <GridColumn Field=@nameof(ProductItem.Id) HeaderText="Mã sản phẩm"></GridColumn>
-        <GridColumn Field=@nameof(ProductItem.CoverUrl) HeaderText="Ảnh"></GridColumn>
-        <GridColumn Field=@nameof(ProductItem.Name) HeaderText="Tên sản phẩm"></GridColumn>
-        <GridColumn Field=@nameof(ProductItem.CategoryName) HeaderText="Loại sản phẩm"></GridColumn>
-        <GridColumn Field=@nameof(ProductItem.Price) HeaderText="Giá gốc"></GridColumn>
-        <GridColumn Field=@nameof(ProductItem.Discount) HeaderText="Giảm giá"></GridColumn>
-        <GridColumn Field=@nameof(ProductItem.IsFlashSale) HeaderText="Flash Sale"></GridColumn>
-    </GridColumns>
-</SfGrid>
+                            <ToolbarItem Text="Xuất Excel"></ToolbarItem>
+                        </ToolbarItems>
+                    </SfToolbar>
+                </ToolbarTemplate>
+            </GridTemplates>
+            <GridGroupSettings Columns=@GroupOption>
+                <CaptionTemplate>
+                    @{
+                        var data = (context as CaptionTemplateContext);
+                        <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
+                    }
+                </CaptionTemplate>
+            </GridGroupSettings>
+            <GridEditSettings AllowAdding="true" AllowDeleting="true"></GridEditSettings>
+            <GridPageSettings PageSize="5">
+            </GridPageSettings>
+            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(ProductItem.Id) HeaderText="Mã sản phẩm"></GridColumn>
+                <GridColumn Field=@nameof(ProductItem.CoverUrl) HeaderText="Ảnh">
+                    <Template>
+                        @{
+                            var product = (context as ProductItem);
+                            <div class="d-flex flex-row align-items-center">
+                                <div class="e-avatar e-avatar-xlarge">
+                                    <img src="@product.CoverUrl" alt="Ảnh đại diện" />
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(ProductItem.Name) HeaderText="Tên sản phẩm"></GridColumn>
+                <GridColumn Field=@nameof(ProductItem.CategoryName) HeaderText="Danh mục"></GridColumn>
+                <GridColumn Field=@nameof(ProductItem.Price) HeaderText="Giá gốc"></GridColumn>
+                <GridColumn Field=@nameof(ProductItem.Discount) HeaderText="Giảm giá"></GridColumn>
+                <GridColumn Field=@nameof(ProductItem.IsFlashSale) HeaderText="Flash Sale">
+                    <Template>
+                        @{
+                            var product = (context as ProductItem);
+
+                            <div class="d-flex flex-row align-items-center justify-content-center">
+                                <SfSwitch @bind-Checked="product.IsFlashSale" CssClass="custom-iOS" TChecked="bool" ValueChange="@(args => OnFlashSale(args, product.Id))"></SfSwitch>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
 
 @code {
+    private bool IsLoading { get; set; } = false;
     // STT, Ảnh, Tên sản phẩm, Loại sản phẩm, Giá gốc, Giảm giá, Flash Sale, Thao tác
     public List<ProductItem> Products { get; set; } = new();
     private SfGrid<ProductItem> Grid;
     private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
     private string[] GroupOption = (new string[] { "Id" });
 
+    private async void OnFlashSale(ChangeEventArgs<bool> args, int id)
+    {
+        if (args.Checked == true)
+        {
+            try
+            {
+                var res = await productService.FlashSale(id);
+
+                if (res.Flag == true)
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+                }
+                else
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+                }
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi cập nhật trạng thái Flash Sale");
+            }
+        }
+        else
+        {
+            try
+            {
+                var res = await productService.FlashSale(id);
+
+                if (res.Flag == true)
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+                }
+                else
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+                }
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi cập nhật trạng thái Flash Sale");
+            }
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
         try
         {
             ServiceModel<ProductList> result = await productService.GetProducts();
@@ -69,6 +174,10 @@
         catch (Exception ex)
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách sản phẩm");
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 
@@ -83,6 +192,79 @@
             await this.Grid.ExpandAllGroupAsync();
             await this.Grid.CloseEditAsync();
         }
+        if (args.Item.Text == "Thêm")
+        {
+            NavManager.NavigateTo("/product/create");
+        }
+        if (args.Item.Text == "Cập nhật")
+        {
+            var selectedRecords = await this.Grid.GetSelectedRecordsAsync();
+
+            if (selectedRecords.Count == 0)
+            {
+                await DisplayDialog("Chọn một dòng để cập nhật", "Thông báo");
+            }
+            else
+            {
+                NavManager.NavigateTo($"/product/update/{selectedRecords[0].Id}");
+            }
+        }
+        if (args.Item.Text == "Xóa")
+        {
+            var selectedRecords = await this.Grid.GetSelectedRecordsAsync();
+
+            if (selectedRecords.Count == 0)
+            {
+                await DisplayDialog("Chọn một dòng để xóa", "Thông báo");
+            }
+            else
+            {
+                var result = await DialogService.ConfirmAsync("Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận xóa");
+
+                if (result == true)
+                {
+                    try
+                    {
+                        var res = await productService.DeleteProduct(selectedRecords[0].Id);
+
+                        if (res.Flag == true)
+                        {
+                            await DisplayDialog(res.Message, "Thông báo");
+
+                            try
+                            {
+                                // Tải lại bảng
+                                ServiceModel<ProductList> data = await productService.GetProducts();
+
+                                if (data.Success == true && data.Data is not null)
+                                {
+                                    Products = data.Data.Products;
+                                    await this.Grid.Refresh();
+                                }
+
+                                await this.Grid.Refresh();
+                            }
+                            catch (Exception)
+                            {
+                                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách sản phẩm");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayDialog(res.Message, "Thông báo");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi xóa sản phẩm");
+                    }
+                }
+            }
+        }
+        if (args.Item.Text == "Xuất Excel")
+        {
+            await this.Grid.ExportToExcelAsync();
+        }
     }
 
     private async Task DisplayDialog(string content, string title)
@@ -90,3 +272,10 @@
         await DialogService.AlertAsync(content, title);
     }
 }
+
+<style>
+    .e-bullet-arrow::before {
+        content: '\e763';
+        font-size: 12px;
+    }
+</style>

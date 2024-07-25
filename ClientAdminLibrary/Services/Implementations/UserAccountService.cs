@@ -23,24 +23,58 @@ namespace ClientAdminLibrary.Services.Implementations
         {
             var httpClient = getHttpClient.GetPublicHttpClient();
             var result = await httpClient.PostAsJsonAsync(AuthUrl + "/login", user);
-            if (!result.IsSuccessStatusCode)
-            {
-                return new LoginResponse(false, "Failed to sign in");
-            }
 
-            return await result.Content.ReadFromJsonAsync<LoginResponse>();
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<LoginResponse>();
+
+                return successResponse ?? new LoginResponse(false, "Login failed");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<LoginResponse>();
+
+                return errorResponse ?? new LoginResponse(false, "Login failed");
+            }
         }
 
         public async Task<LoginResponse> RefreshTokenAsync(RefreshToken refreshToken)
         {
             var httpClient = getHttpClient.GetPublicHttpClient();
             var result = await httpClient.PostAsJsonAsync(AuthUrl + "/refresh-token", refreshToken);
-            if (!result.IsSuccessStatusCode)
-            {
-                return new LoginResponse(false, "Failed to create user");
-            }
 
-            return await result.Content.ReadFromJsonAsync<LoginResponse>();
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<LoginResponse>();
+
+                return successResponse ?? new LoginResponse(false, "Refresh token failed");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<LoginResponse>();
+
+                return errorResponse ?? new LoginResponse(false, "Refresh token failed");
+            }
+        }
+
+        public async Task<GeneralResponse> CreateAsync(Register user)
+        {
+            var httpClient = getHttpClient.GetPublicHttpClient();
+
+            var result = await httpClient.PostAsJsonAsync(AuthUrl + "/register", user);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Register failed");
+            }
+            else
+            {
+                var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return errorResponse ?? new GeneralResponse(false, "Register failed");
+            }
         }
     }
 }

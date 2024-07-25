@@ -34,6 +34,8 @@ namespace ServerLibrary.Repositories.Implementations
 
             // Xóa user
             context.ApplicationUsers.Remove(userWithRole.u);
+            // Xóa vai trò
+            context.UserRoles.RemoveRange(context.UserRoles.Where(ur => ur.UserId == userWithRole.u.Id));
 
             // Lưu thay đổi
             await context.SaveChangesAsync();
@@ -187,6 +189,50 @@ namespace ServerLibrary.Repositories.Implementations
             return response;
         }
 
+        public async Task<GeneralResponse> LockUser(int id)
+        {
+            // Lấy user theo id cùng vai trò
+            var userWithRole = context.ApplicationUsers
+                .Where(u => u.Id == id)
+                .Join(context.UserRoles, u => u.Id, ur => ur.UserId, (u, ur) => new { u, ur })
+                .Join(context.SystemRoles, ur => ur.ur.RoleId, r => r.Id, (ur, r) => new { ur.u, r })
+                .FirstOrDefault();
+
+            // Nếu không có user nào, trả về lỗi
+            if (userWithRole is null)
+            {
+                return new GeneralResponse(false, "Người dùng không tồn tại");
+            }
+
+            // Kiểm tra nếu User là tài khoản Admin, không cho phép khóa
+            if (userWithRole.r.Name == "Admin")
+            {
+                return new GeneralResponse(false, "Không thể khóa tài khoản với quyền hạn Admin");
+            }
+
+            // Kiểm tra nếu User là tài khoản duy nhất có vai trò Admin, không cho phép khóa
+            if (userWithRole.r.Name == "Admin" && context.UserRoles.Count(ur => ur.RoleId == userWithRole.r.Id) == 1)
+            {
+                return new GeneralResponse(false, "Không thể khóa tài khoản duy nhất với quyền hạn Admin");
+            }
+
+            // Kiểm tra nếu User là tài khoản User, không cho phép khóa
+            if (userWithRole.r.Name == "User")
+            {
+                return new GeneralResponse(false, "Không thể khóa tài khoản với quyền hạn User");
+            }
+
+
+            // Đảo ngược giá trị IsLocked
+            userWithRole.u.IsLocked = !userWithRole.u.IsLocked;
+
+            // Lưu thay đổi
+            await context.SaveChangesAsync();
+
+            // Trả về thông báo thành công
+            return new GeneralResponse(true, userWithRole.u.IsLocked ? "Khóa tài khoản thành công" : "Mở khóa tài khoản thành công");
+        }
+
         public async Task<GeneralResponse> UpdateUser(int id, UpdateUserDTO user)
         {
             // Lấy user theo id cùng vai trò
@@ -211,19 +257,19 @@ namespace ServerLibrary.Repositories.Implementations
             }
 
             // Nếu mã phường/xã/thị trấn không hợp lệ, trả về lỗi
-            if (user.Address != null && !context.Wards.Any(w => w.Code == user.Address.WardId))
+            if (user.WardId != null && !context.Wards.Any(w => w.Code == user.WardId))
             {
                 return new GeneralResponse(false, "Mã phường/xã/thị trấn không hợp lệ");
             }
 
             // Nếu mã quận/huyện không hợp lệ, trả về lỗi
-            if (user.Address != null && !context.Districts.Any(d => d.Code == user.Address.DistrictId))
+            if (user.DistrictId != null && !context.Districts.Any(d => d.Code == user.DistrictId))
             {
                 return new GeneralResponse(false, "Mã quận/huyện không hợp lệ");
             }
 
             // Nếu mã tỉnh/thành phố không hợp lệ, trả về lỗi
-            if (user.Address != null && !context.Provinces.Any(p => p.Code == user.Address.ProvinceId))
+            if (user.ProvinceId != null && !context.Provinces.Any(p => p.Code == user.ProvinceId))
             {
                 return new GeneralResponse(false, "Mã tỉnh/thành phố không hợp lệ");
             }
@@ -232,29 +278,75 @@ namespace ServerLibrary.Repositories.Implementations
             userWithRole.u.Fullname = user.Fullname;
             userWithRole.u.Email = user.Email;
             userWithRole.u.PhoneNumber = user.PhoneNumber;
-            userWithRole.u.Address = user.Address != null ? new Address
+            // Tìm địa chỉ của user hiện tại và cập nhật, nếu không tìm thấy thì tạo mới
+            Address address = await context.Addresses.FindAsync(userWithRole.u.AddressId);
+            if (address is null)
             {
-                AddressDetail = user.Address.Address,
-                WardId = user.Address.WardId,
-                DistrictId = user.Address.DistrictId,
-                ProvinceId = user.Address.ProvinceId
-            } : null;
+                address = new Address
+                {
+                    AddressDetail = user.Address,
+                    WardId = user.WardId,
+                    DistrictId = user.DistrictId,
+                    ProvinceId = user.ProvinceId
+                };
+                context.Addresses.Add(address);
+            }
+            else
+            {
+                address.AddressDetail = user.Address;
+                address.WardId = user.WardId;
+                address.DistrictId = user.DistrictId;
+                address.ProvinceId = user.ProvinceId;
+            }
             userWithRole.u.Photo = user.Photo;
             userWithRole.u.Other = user.Other;
             userWithRole.u.CreatedAt = DateOnly.FromDateTime(DateTime.Now);
-            userWithRole.u.IsLocked = user.IsLocked;
 
             // Nếu giá trị vai trò thay đổi, cập nhật vai trò
             if (user.Role != null)
             {
+                // Nếu tài khoản là tài khoản duy nhất có vai trò Admin, không cho phép thay đổi
+                if (userWithRole.r.Name == "Admin" && context.UserRoles.Count(ur => ur.RoleId == userWithRole.r.Id) == 1)
+                {
+                    return new GeneralResponse(false, "Không thể thay đổi vai trò của tài khoản duy nhất với quyền hạn Admin");
+                }
+
+                // Nếu tài khoản là vai trò User, không cho phép thay đổi
+                if (userWithRole.r.Name == "User")
+                {
+                    return new GeneralResponse(false, "Quyền hạn không hợp lệ");
+                }
+
                 // Lấy id của vai trò mới
                 int roleId = await context.SystemRoles
                     .Where(r => r.Name == user.Role)
                     .Select(r => r.Id)
                     .FirstOrDefaultAsync();
 
-                // Cập nhật vai trò
-                userWithRole.r.Id = roleId;
+                // Cập nhật vai trò trong bảng vai trò người dùng
+                var userRole = await context.UserRoles
+                    .Where(ur => ur.UserId == userWithRole.u.Id)
+                    .FirstOrDefaultAsync();
+
+                if (roleId == 0) {
+                    return new GeneralResponse(false, "Vai trò không hợp lệ");
+                }
+
+                if (userRole is null)
+                {
+                    userRole = new UserRole
+                    {
+                        UserId = userWithRole.u.Id,
+                        RoleId = roleId
+                    };
+                    context.UserRoles.Add(userRole);
+                }
+                else
+                {
+                    userRole.RoleId = roleId;
+                }
+
+                userRole.RoleId = roleId;
             }
 
             // Lưu thay đổi

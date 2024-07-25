@@ -6,6 +6,8 @@ namespace ServerLibrary.Repositories.Interfaces
     public interface ICategoryRepo
     {
         public Task<ServiceModel<CategoryItem>> GetCategory(int id);
+        public Task<ServiceModel<CategoryItem>> GetCategoryByName(string name);
+
         public Task<ServiceModel<CategoryList>> GetCategories(int? page, int? pageSize);
         public Task<GeneralResponse> AddCategory(CreateCategoryDTO category);
         public Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category);

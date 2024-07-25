@@ -1,0 +1,536 @@
+﻿@page "/user/update/{id}"
+
+@using BaseLibrary.Models
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Data
+@using Syncfusion.Blazor.DataForm
+@using Syncfusion.Blazor.DropDowns
+@using Syncfusion.Blazor.Inputs
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
+
+@if (IsLoading == true)
+{
+    <div id="container">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
+    </div>
+}
+else
+{
+    <div class="bg-white shadow-lg p-2">
+        <h1 class="text-black
+         fs-5 mb-0">
+            <strong>
+                Cập nhật người dùng: @updateUserDto.Fullname
+            </strong>
+        </h1>
+    </div>
+
+    <div class="px-4">
+        <SfBreadcrumb class="my-2">
+            <BreadcrumbItems>
+                <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
+                <BreadcrumbItem Text="Người dùng" IconCss="bi bi-people" Url="/user"></BreadcrumbItem>
+                <BreadcrumbItem Text="Cập nhật người dùng" IconCss="bi bi-person-fill-gear"></BreadcrumbItem>
+            </BreadcrumbItems>
+            <BreadcrumbTemplates>
+                <ItemTemplate>
+                    <SfChip>
+                        <ChipItems>
+                            <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
+                        </ChipItems>
+                    </SfChip>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                    <span class="e-icons e-bullet-arrow"></span>
+                </SeparatorTemplate>
+            </BreadcrumbTemplates>
+        </SfBreadcrumb>
+
+        <SfDataForm ID="UpdateUserForm" Model="@updateUserDto" ButtonsAlignment="FormButtonsAlignment.Center" ColumnCount="2" ColumnSpacing="24px" ValidationDisplayMode="FormValidationDisplay.Tooltip" OnSubmit="@SubmitHandler">
+            <FormValidator>
+                <DataAnnotationsValidator></DataAnnotationsValidator>
+                <ValidationSummary></ValidationSummary>
+            </FormValidator>
+            <FormItems>
+                <FormGroup LabelText="Ảnh đại diện" ID="user-cover-group">
+                    <FormItem Field="@nameof(updateUserDto.Photo)" LabelText="Ảnh đại diện">
+                        <Template>
+                            <div class="d-flex flex-row gap-4 justify-content-between align-items-center">
+
+                                <div class="e-avatar e-avatar-xlarge e-avatar-circle">
+                                    <img src="@updateUserDto.Photo" alt="Ảnh đại diện" />
+                                </div>
+                                <div class="d-flex flex-grow-1 justify-content-center flex-column">
+                                    <label>Chọn ảnh đại diện</label>
+                                    <SfUploader AutoUpload="true" AllowedExtensions=".png, .jpeg, .webp, .svg, .gif, .bmp, .tiff, .jpg">
+                                        <UploaderEvents ValueChange="@OnUploadImages">
+                                        </UploaderEvents>
+                                    </SfUploader>
+                                </div>
+                            </div>
+                        </Template>
+                    </FormItem>
+                </FormGroup>
+                <FormGroup LabelText="Thông tin cá nhân" ID="user-information-group" ColumnCount="6" ColumnSpacing="16px">
+                    <FormItem Field="@nameof(updateUserDto.Fullname)" LabelText="Họ và Tên" ColumnSpan="3"></FormItem>
+                    <FormItem Field="@nameof(updateUserDto.Email)" LabelText="Email" ColumnSpan="3"></FormItem>
+                    <FormItem Field="@nameof(updateUserDto.PhoneNumber)" LabelText="Số điện thoại" ColumnSpan="3"></FormItem>
+                    <FormItem Field="@nameof(updateUserDto.Address)" LabelText="Địa chỉ cụ thể" ColumnSpan="3" ID="Address">
+                        <Template>
+                            <label for="@nameof(updateUserDto.Address)" class="e-form-label">Địa chỉ cụ thể</label>
+                            <SfTextBox @bind-Value="updateUserDto.Address" ID="Address"></SfTextBox>
+                        </Template>
+                    </FormItem>
+                    <FormItem Field="@nameof(updateUserDto.ProvinceId)" LabelText="Chọn tỉnh/thành phố" ColumnSpan="2">
+                        <Template>
+                            <label class="e-form-label">Chọn tỉnh/thành phố</label>
+                            <SfAutoComplete @ref="autoObjProvince" TValue="ProvinceItem" TItem="ProvinceItem" Placeholder="Chọn tỉnh/thành phố" DataSource="@Provinces" Highlight="true" CssClass="e-multi-column" @bind-Value="SelectedProvince">
+                                <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
+                                <AutoCompleteEvents Filtering="OnProvinceFiltering" TValue="ProvinceItem" TItem="ProvinceItem" OnValueSelect="@OnProvinceSelecthandler"></AutoCompleteEvents>
+                                <AutoCompleteTemplates TItem="ProvinceItem">
+                                    <HeaderTemplate>
+                                        <table>
+                                            <tr>
+                                                <th>Mã</th>
+                                                <th>Tỉnh/thành phố</th>
+                                            </tr>
+                                        </table>
+                                    </HeaderTemplate>
+                                    <ItemTemplate Context="itemContext">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>@itemContext.Code</td>
+                                                    <td>@itemContext.FullName</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </ItemTemplate>
+                                </AutoCompleteTemplates>
+                            </SfAutoComplete>
+                        </Template>
+                    </FormItem>
+                    <FormItem Field="@nameof(updateUserDto.DistrictId)" LabelText="Chọn quận/huyện" ColumnSpan="2" ID="DistrictId">
+                        <Template>
+                            <label class="e-form-label">Chọn quận/huyện</label>
+                            <SfAutoComplete @ref="autoObjDistrict" TValue="DistrictItem" TItem="DistrictItem" Placeholder="Chọn quận/huyện" DataSource="@Districts" Highlight="true" CssClass="e-multi-column" @bind-Value="SelectedDistrict" ID="DistrictId">
+                                <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
+                                <AutoCompleteEvents Filtering="OnDistrictFiltering" TValue="DistrictItem" TItem="DistrictItem" OnValueSelect="@OnDistrictSelecthandler"></AutoCompleteEvents>
+                                <AutoCompleteTemplates TItem="DistrictItem">
+                                    <HeaderTemplate>
+                                        <table>
+                                            <tr>
+                                                <th>Mã</th>
+                                                <th>Quận/huyện</th>
+                                            </tr>
+                                        </table>
+                                    </HeaderTemplate>
+                                    <ItemTemplate Context="itemContext">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>@itemContext.Code</td>
+                                                    <td>@itemContext.FullName</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </ItemTemplate>
+                                </AutoCompleteTemplates>
+                            </SfAutoComplete>
+                        </Template>
+                    </FormItem>
+                    <FormItem Field="@nameof(updateUserDto.WardId)" LabelText="Chọn phường/xã" ColumnSpan="2" ID="WardId">
+                        <Template>
+                            <label class="e-form-label">Chọn phường/xã</label>
+                            <SfAutoComplete @ref="autoObjWard" TValue="WardItem" TItem="WardItem" Placeholder="Chọn phường/xã" DataSource="@Wards" Highlight="true" CssClass="e-multi-column" @bind-Value="SelectedWard" ID="WardId">
+                                <AutoCompleteFieldSettings Text="FullName" Value="Code"></AutoCompleteFieldSettings>
+                                <AutoCompleteEvents Filtering="OnWardFiltering" TValue="WardItem" TItem="WardItem" OnValueSelect="@OnWardSelecthandler"></AutoCompleteEvents>
+                                <AutoCompleteTemplates TItem="WardItem">
+                                    <HeaderTemplate>
+                                        <table>
+                                            <tr>
+                                                <th>Mã</th>
+                                                <th>Phường/xã</th>
+                                            </tr>
+                                        </table>
+                                    </HeaderTemplate>
+                                    <ItemTemplate Context="itemContext">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>@itemContext.Code</td>
+                                                    <td>@itemContext.FullName</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </ItemTemplate>
+                                </AutoCompleteTemplates>
+                            </SfAutoComplete>
+                        </Template>
+                    </FormItem>
+                    <FormItem Field="@nameof(updateUserDto.Role)" LabelText="Ủy quyền" ColumnSpan="6" ID="Role">
+                        <Template>
+                            <label for="@nameof(updateUserDto.Role)" class="e-form-label">Chọn ủy quyền</label>
+                            <SfDropDownList TValue="string" TItem="SystemRole" DataSource="@Roles" @bind-Value="updateUserDto.Role" Placeholder="Chọn ủy quyền" CssClass="e-multi-column" ID="Role">
+                                <DropDownListTemplates TItem="SystemRole">
+                                    <ValueTemplate>
+                                        @if (context.Name == "Admin")
+                                            {
+                                                <span class="badge bg-danger">Quản trị viên</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success">Người dùng</span>
+                                            }
+                                        </ValueTemplate>
+                                    </DropDownListTemplates>
+                                    <DropDownListFieldSettings Text="Name" Value="Name"></DropDownListFieldSettings>
+                                </SfDropDownList>
+                            </Template>
+                        </FormItem>
+                    </FormGroup>
+                </FormItems>
+                <FormButtons>
+                    <SfButton typeof="submit">Cập nhật người dùng</SfButton>
+                </FormButtons>
+            </SfDataForm>
+        </div>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private UpdateUserDTO updateUserDto = new();
+
+
+    private bool IsLoading { get; set; } = false;
+
+    public List<ProvinceItem> Provinces { get; set; } = new();
+    public List<DistrictItem> Districts { get; set; } = new();
+    public List<WardItem> Wards { get; set; } = new();
+
+    public ProvinceItem SelectedProvince { get; set; } = new();
+    public DistrictItem SelectedDistrict { get; set; } = new();
+    public WardItem SelectedWard { get; set; } = new();
+
+    public Query query { get; set; }
+    SfAutoComplete<ProvinceItem, ProvinceItem> autoObjProvince;
+    SfAutoComplete<DistrictItem, DistrictItem> autoObjDistrict;
+    SfAutoComplete<WardItem, WardItem> autoObjWard;
+
+    List<SystemRole> Roles = new List<SystemRole> {
+        new SystemRole { Id = 1, Name = "Admin" },
+        new SystemRole { Id = 2, Name = "User" }
+    };
+
+    async private void OnWardSelecthandler(SelectEventArgs<WardItem> args)
+    {
+        SelectedWard = args.ItemData;
+        updateUserDto.WardId = SelectedWard.Code;
+    }
+
+    async private void OnDistrictSelecthandler(SelectEventArgs<DistrictItem> args)
+    {
+        SelectedDistrict = args.ItemData;
+        // Tải danh sách phường/xã
+        try
+        {
+            ServiceModel<WardList> result = await addressService.GetWards(SelectedProvince.Code, SelectedDistrict.Code);
+            if (result.Success == true && result.Data is not null)
+            {
+                Wards = result.Data.Wards;
+                updateUserDto.DistrictId = SelectedDistrict.Code;
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách phường/xã");
+        }
+    }
+
+    async private void OnProvinceSelecthandler(SelectEventArgs<ProvinceItem> args)
+    {
+        SelectedProvince = args.ItemData;
+
+        // Tải danh sách quận/huyện
+        try
+        {
+            ServiceModel<DistrictList> result = await addressService.GetDistricts(SelectedProvince.Code);
+            if (result.Success == true && result.Data is not null)
+            {
+                Districts = result.Data.Districts;
+                updateUserDto.ProvinceId = SelectedProvince.Code;
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", ex.Message);
+        }
+    }
+
+    public async Task OnWardFiltering(FilteringEventArgs args)
+    {
+        args.PreventDefaultAction = true;
+
+        var orWhere = WhereFilter.Or(new List<WhereFilter> {
+                                new WhereFilter() { Field = "Code", Operator = "contains", value = args.Text, IgnoreCase = true },
+                                new WhereFilter() { Field = "FullName", Operator = "contains", value = args.Text, IgnoreCase = true }
+                                });
+        var query = new Query().Where(orWhere);
+        query = !string.IsNullOrEmpty(args.Text) ? query : new Query();
+        await autoObjWard.FilterAsync(Wards, query);
+    }
+
+    public async Task OnDistrictFiltering(FilteringEventArgs args)
+    {
+        args.PreventDefaultAction = true;
+
+        var orWhere = WhereFilter.Or(new List<WhereFilter> {
+                                new WhereFilter() { Field = "Code", Operator = "contains", value = args.Text, IgnoreCase = true },
+                                new WhereFilter() { Field = "FullName", Operator = "contains", value = args.Text, IgnoreCase = true }
+                                });
+        var query = new Query().Where(orWhere);
+        query = !string.IsNullOrEmpty(args.Text) ? query : new Query();
+        await autoObjDistrict.FilterAsync(Districts, query);
+    }
+
+    public async Task OnProvinceFiltering(FilteringEventArgs args)
+    {
+        args.PreventDefaultAction = true;
+
+        var orWhere = WhereFilter.Or(new List<WhereFilter> {
+                                new WhereFilter() { Field = "Code", Operator = "contains", value = args.Text, IgnoreCase = true },
+                                new WhereFilter() { Field = "FullName", Operator = "contains", value = args.Text, IgnoreCase = true }
+                                });
+        var query = new Query().Where(orWhere);
+        query = !string.IsNullOrEmpty(args.Text) ? query : new Query();
+        await autoObjProvince.FilterAsync(Provinces, query);
+    }
+
+    async Task OnUploadImages(UploadChangeEventArgs args)
+    {
+        try
+        {
+            foreach (var file in args.Files)
+            {
+                using (var stream = file.File.OpenReadStream(long.MaxValue))
+                {
+                    var res = await cloudinaryService.UploadImageAsync(stream, file.FileInfo.Name);
+
+                    if (res.Success == false)
+                    {
+                        await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi tải ảnh lên máy chủ");
+                    }
+                    else
+                    {
+                        await DisplayDialog("Tải ảnh thành công", "Tải ảnh thành công");
+                        updateUserDto.Photo = res.Data;
+                        StateHasChanged();
+                    }
+                }
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi tải ảnh lên máy chủ");
+        }
+    }
+
+    public async void SubmitHandler(EditContext context)
+    {
+        IsLoading = true;
+        bool isValid = context.Validate();
+
+        if (isValid)
+        {
+            try
+            {
+                var res = await userService.UpdateUser(int.Parse(Id), updateUserDto);
+
+                if (res.Flag == false)
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+
+                    NavManager.NavigateTo("/user");
+                }
+                else
+                {
+                    await DisplayDialog(res.Message, "Thông báo");
+
+                    NavManager.NavigateTo("/user");
+                }
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi cập nhật người dùng");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        string[] userAddresses = new string[3];
+
+        try
+        {
+            // Lấy thông tin người dùng theo Id
+            ServiceModel<UserItem> result = await userService.GetUser(int.Parse(Id));
+
+            if (result.Success == true && result.Data != null)
+            {   
+                if (result.Data.Address != null)
+                    userAddresses = result.Data.Address.Split(", ");
+                else
+                {
+                    await DisplayDialog("Người dùng chưa có địa chỉ", "Thông báo");
+
+                    NavManager.NavigateTo("/user");
+                }
+
+                updateUserDto = new UpdateUserDTO
+                    {
+                        Email = result.Data.Email,
+                        Fullname = result.Data.Fullname,
+                        IsLocked = result.Data.IsLocked,
+                        Role = result.Data.Role,
+                        Other = result.Data.Other,
+                        PhoneNumber = result.Data.PhoneNumber,
+                        Photo = result.Data.Photo,
+                        Address = userAddresses[0]
+                    };
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy thông tin người dùng");
+
+            NavManager.NavigateTo("/user");
+        }
+        try
+        {
+            // Lấy danh sách tỉnh/thành
+            ServiceModel<ProvinceList> result = await addressService.GetProvinces();
+
+            if (result.Success == true && result.Data is not null)
+            {
+                Provinces = result.Data.Provinces;
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách tỉnh/thành phố");
+
+            NavManager.NavigateTo("/user");
+        }
+        try
+        {
+            // Tìm thành phố theo tên
+            ProvinceItem? province = Provinces.Find(p => p.FullName == userAddresses[3]);
+
+            if (province != null)
+            {
+                SelectedProvince = province;
+                updateUserDto.ProvinceId = province.Code;
+
+                // Lấy danh sách quận/huyện
+                ServiceModel<DistrictList> result = await addressService.GetDistricts(province.Code);
+
+                if (result.Success == true && result.Data is not null)
+                {
+                    Districts = result.Data.Districts;
+                }
+            }
+            else
+            {
+                await DisplayDialog("Không tìm thấy tỉnh/thành phố", "Thông báo");
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách quận/huyện");
+
+            NavManager.NavigateTo("/user");
+        }
+        try
+        {
+            // Tìm quận/huyện theo tên
+            DistrictItem? district = Districts.Find(d => d.FullName == userAddresses[2]);
+
+            if (district != null)
+            {
+                SelectedDistrict = district;
+                updateUserDto.DistrictId = district.Code;
+
+                // Lấy danh sách phường/xã
+                ServiceModel<WardList> result = await addressService.GetWards(SelectedProvince.Code, district.Code);
+
+                if (result.Success == true && result.Data is not null)
+                {
+                    Wards = result.Data.Wards;
+                }
+
+                // Tìm phường/xã theo tên
+                WardItem? ward = Wards.Find(w => w.FullName == userAddresses[1]);
+
+                if (ward != null)
+                {
+                    SelectedWard = ward;
+                    updateUserDto.WardId = ward.Code;
+                }
+                else
+                {
+                    await DisplayDialog("Không tìm thấy phường/xã", "Thông báo");
+                }
+            }
+            else
+            {
+                await DisplayDialog("Không tìm thấy quận/huyện", "Thông báo");
+            }
+        }
+        catch (Exception)
+        {
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách phường/xã");
+
+            NavManager.NavigateTo("/user");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task DisplayDialog(string content, string title)
+    {
+        await DialogService.AlertAsync(content, title);
+    }
+}
+
+<style>
+    .e-bullet-arrow::before {
+        content: '\e763';
+        font-size: 12px;
+    }
+
+    .e-highlight {
+        background-color: yellow;
+    }
+
+    .e-avatar.e-avatar-xlarge {
+        height: 128px;
+        width: 128px;
+    }
+
+    .e-ddl.e-lib.valid.e-input-group.e-control-container.e-control-wrapper.e-multi-column.e-valid-input {
+        align-items: center;
+        padding-left: 8px;
+    }
+</style>

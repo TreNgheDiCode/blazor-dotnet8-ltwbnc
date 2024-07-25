@@ -15,14 +15,30 @@ namespace Server.Controllers
         public async Task<IActionResult> GetDiscounts(int? page, int? pageSize)
         {
             var result = await repo.GetDiscounts(page, pageSize);
-            return Ok(result);
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDiscount(int id)
         {
             var result = await repo.GetDiscount(id);
-            return Ok(result);
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpPost]
@@ -30,7 +46,15 @@ namespace Server.Controllers
         public async Task<IActionResult> AddDiscount(CreateDiscountDTO discount)
         {
             var result = await repo.AddDiscount(discount);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpPut("{id}")]
@@ -38,7 +62,15 @@ namespace Server.Controllers
         public async Task<IActionResult> UpdateDiscount(int id, UpdateDiscountDTO discount)
         {
             var result = await repo.UpdateDiscount(id, discount);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
 
         [HttpDelete("{id}")]
@@ -46,7 +78,15 @@ namespace Server.Controllers
         public async Task<IActionResult> DeleteDiscount(int id)
         {
             var result = await repo.DeleteDiscount(id);
-            return Ok(result);
+
+            if (result.Flag)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
         }
     }
 }

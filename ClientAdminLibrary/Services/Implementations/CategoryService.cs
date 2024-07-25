@@ -10,14 +10,41 @@ namespace ClientAdminLibrary.Services.Implementations
     {
         public const string CategoryUrl = "api/categories";
 
-        public Task<GeneralResponse> CreateCategory(CreateCategoryDTO category)
+        public async Task<GeneralResponse> CreateCategory(CreateCategoryDTO category)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PostAsJsonAsync(CategoryUrl, category);
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Thêm danh mục thành công");
+            }
+
+            var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+            return errorResponse ?? new GeneralResponse(false, "Thêm danh mục thất bại");
         }
 
-        public Task<GeneralResponse> DeleteCategory(int id)
+        public async Task<GeneralResponse> DeleteCategory(int id)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.DeleteAsync($"{CategoryUrl}/{id}");
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Xóa danh mục thành công");
+            }
+
+            var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+            return errorResponse ?? new GeneralResponse(false, "Xóa danh mục thất bại");
         }
 
         public async Task<ServiceModel<CategoryList>> GetCategories()
@@ -40,14 +67,60 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
-        public Task<ServiceModel<CategoryItem>> GetCategory(int id)
+        public async Task<ServiceModel<CategoryItem>> GetCategory(int id)
         {
-            throw new NotImplementedException();
+            var client = httpClient.GetPublicHttpClient();
+            var result = await client.GetFromJsonAsync<ServiceModel<CategoryItem>>($"{CategoryUrl}/{id}");
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
+            if (result == null)
+            {
+                return new ServiceModel<CategoryItem>()
+                {
+                    Data = null,
+                    Message = "Lỗi máy chủ",
+                    Success = false
+                };
+            }
+
+            return result;
         }
 
-        public Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category)
+        public async Task<ServiceModel<CategoryItem>> GetCategoryByName(string name)
         {
-            throw new NotImplementedException();
+            var client = httpClient.GetPublicHttpClient();
+            var result = await client.GetFromJsonAsync<ServiceModel<CategoryItem>>($"{CategoryUrl}/name/{name}");
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
+            if (result == null)
+            {
+                return new ServiceModel<CategoryItem>()
+                {
+                    Data = null,
+                    Message = "Lỗi máy chủ",
+                    Success = false
+                };
+            }
+
+            return result;
+        }
+
+        public async Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category)
+        {
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PutAsJsonAsync($"{CategoryUrl}/{id}", category);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Cập nhật danh mục thành công");
+            }
+
+            var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+            return errorResponse ?? new GeneralResponse(false, "Cập nhật danh mục thất bại");
         }
     }
 }

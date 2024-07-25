@@ -1,47 +1,166 @@
 ﻿@page "/search/{SearchQuery}"
 @inject HttpClient httpClient
 @inject NavigationManager NavigationManager
-@inject CartService CartService 
+@inject CartService CartService
 @layout MainLayout
 
+
+<style>
+    /* styles.css */
+
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .product-container {
+        padding: 20px;
+    }
+
+    .product-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+    }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12), 0 6px 6px rgba(0, 0, 0, 0.16);
+        }
+
+    .card-title a {
+        font-size: 1.2rem;
+        color: #333;
+        text-decoration: none;
+    }
+
+        .card-title a:hover {
+            color: #007bff;
+        }
+
+    .card-text {
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .price {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .view-detail-btn {
+        background-color: #ff5a5f;
+        border: none;
+    }
+
+        .view-detail-btn:hover {
+            background-color: #e04a4e;
+        }
+
+    .carousel-item img {
+        max-height: 400px;
+        object-fit: cover;
+    }
+
+    .carousel-caption {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+    }
+    /* styles.css */
+
+    .product-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Ensure the button stays at the bottom */
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Adjust if needed to place content and button properly */
+    }
+
+    .view-detail-btn {
+        background-color: #ff5a5f;
+        border: none;
+        display: block; /* Ensures button takes up the full width of its container */
+        margin: 0 auto; /* Centers the button horizontally */
+    }
+
+        .view-detail-btn:hover {
+            background-color: #e04a4e;
+        }
+
+    .price {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+</style>
 @if (loading)
 {
-    <p>Loading...</p>
+    <div class="loading-spinner">
+        <button class="btn btn-primary" type="button" disabled>
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Đang tải...
+        </button>
+    </div>
 }
 else
 {
-
-    <h2 class="text-center mb-4">Danh Sách Tìm Kiếm</h2>
-    @if (products != null && products.Products.Any())
-    {
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var product in filteredProducts)
-            {
-                <div class="col">
-                    <div class="product-card">
-                        <img  src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
-                        <h5 class="card-title"><a href="/products/detail/@product.Id">@product.Name</a></h5>
-                        <p class="card-text">@product.Description</p>
-                        <div class="price">Price: <span>@string.Format("{0:0,0 đồng}", product.Price)</span></div>
-                        <button class="btn btn-danger" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
-
+    <div class="container product-container mt-4">
+        <h2 class="text-center mb-4">Danh Sách Tìm Kiếm</h2>
+        @if (products != null && products.Products.Any())
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                @foreach (var product in filteredProducts)
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            @if (product.ProductImages != null && product.ProductImages.Count > 0 && product.ProductImages[0].ImageUrl != null)
+                            {
+                                <img src="@product.ProductImages[0].ImageUrl" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            else
+                            {
+                                <img src="images/logongang.png" class="card-img-top img-fluid" alt="Product Image">
+                            }
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <a href="/products/detail/@product.Id" class="text-decoration-none text-dark">@product.Name</a>
+                                </h5>
+                                <p class="card-text text-muted">@product.Description</p>
+                                <div class="price mb-2">
+                                    Giá: <span class="text-success">@string.Format("{0:0,0 đồng}", product.Price)</span>
+                                </div>
+                                <button class="btn btn-primary view-detail-btn" @onclick="() => NavigateToProductDetail(product.Id)">Xem chi tiết</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <p class="text-center">No products found.</p>
-    }
-
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-center mt-4">Không có sản phẩm nào!!</p>
+        }
+    </div>
 }
 
 @code {
     [Parameter]
-    public string SearchQuery { get; set; }=string.Empty;
+    public string SearchQuery { get; set; } = string.Empty;
     private ProductList? products;
-    private List<ProductItem>? filteredProducts=new();
+    private List<ProductItem>? filteredProducts = new();
     private bool loading = false;
 
     protected override async Task OnInitializedAsync()
@@ -51,7 +170,6 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        // Gọi LoadAndFilterProducts mỗi khi tham số thay đổi
         await LoadAndFilterProducts();
     }
 
@@ -72,23 +190,21 @@ else
     {
         if (products != null)
         {
-            if (!string.IsNullOrEmpty(SearchQuery)) // Sử dụng SearchQuery từ URL
+            if (!string.IsNullOrEmpty(SearchQuery))
             {
-                // Sử dụng Contains thay vì StartsWith để tìm kiếm sản phẩm
                 filteredProducts = products.Products
                     .Where(p => p.Name?.Contains(SearchQuery, StringComparison.OrdinalIgnoreCase) ?? false)
                     .ToList();
             }
             else
             {
-                // Nếu không có từ khóa tìm kiếm, hiển thị tất cả sản phẩm
                 filteredProducts = products.Products.ToList();
             }
         }
     }
+
     private void NavigateToProductDetail(int productId)
     {
         NavigationManager.NavigateTo($"/products/detail/{productId}");
     }
 }
-
