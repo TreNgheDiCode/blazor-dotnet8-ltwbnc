@@ -194,7 +194,7 @@ namespace ServerLibrary.Repositories.Implementations
             {
                 return new ServiceModel<DiscountList>
                 {
-                    Success = false,
+                    Success = true,
                     Message = "Danh sách giảm giá trống",
                     Data = null
                 };

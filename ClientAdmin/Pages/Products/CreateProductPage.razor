@@ -154,7 +154,6 @@ else
     private bool IsLoading = false;
 
     private List<CategoryItem> Categories { get; set; } = new List<CategoryItem>();
-    private List<ProductItem> Products { get; set; } = new List<ProductItem>();
 
     private CreateProductDTO productDetail = new();
     private string[] ProductImagesUrl { get; set; } = [];
@@ -162,6 +161,7 @@ else
     private void AddOption()
     {
         productDetail.ProductOptions.Add(new ProductOptionDTO());
+        return;
     }
 
     private async Task OnUploadProductImages(UploadChangeEventArgs args)
@@ -216,7 +216,7 @@ else
                     }
                     else
                     {
-                        if (i == 0)
+                        if (i == 0 && productDetail.CoverUrl is null)
                         {
                             productDetail.CoverUrl = res.Data;
                         };
@@ -283,23 +283,6 @@ else
         catch (Exception)
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách danh mục");
-        }
-        try
-        {
-            ServiceModel<ProductList> result = await productService.GetProducts();
-
-            if (result.Success == true && result.Data is not null)
-            {
-                Products = result.Data.Products;
-            }
-            else
-            {
-                await DisplayDialog(result.Message, "Thông báo");
-            }
-        }
-        catch (Exception)
-        {
-            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách sản phẩm");
         }
         finally
         {

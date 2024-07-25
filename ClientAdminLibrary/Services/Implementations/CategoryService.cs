@@ -86,6 +86,25 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
+        public async Task<ServiceModel<CategoryItem>> GetCategoryByName(string name)
+        {
+            var client = httpClient.GetPublicHttpClient();
+            var result = await client.GetFromJsonAsync<ServiceModel<CategoryItem>>($"{CategoryUrl}/name/{name}");
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
+            if (result == null)
+            {
+                return new ServiceModel<CategoryItem>()
+                {
+                    Data = null,
+                    Message = "Lỗi máy chủ",
+                    Success = false
+                };
+            }
+
+            return result;
+        }
+
         public async Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category)
         {
             var client = await httpClient.GetPrivateHttpClient();

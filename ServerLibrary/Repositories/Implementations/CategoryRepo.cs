@@ -153,6 +153,39 @@ namespace ServerLibrary.Repositories.Implementations
             };
         }
 
+        public async Task<ServiceModel<CategoryItem>> GetCategoryByName(string name)
+        {
+            // Lấy danh mục theo tên
+            CategoryItem? category = await context.Categories
+                .Where(c => c.Name == name)
+                .Select(c => new CategoryItem
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ProductCount = c.Products.Count
+                })
+                .FirstOrDefaultAsync();
+
+            // Nếu không tìm thấy danh mục
+            if (category == null)
+            {
+                return new ServiceModel<CategoryItem>
+                {
+                    Success = false,
+                    Message = "Không tìm thấy danh mục",
+                    Data = null
+                };
+            }
+
+            // Trả về danh mục
+            return new ServiceModel<CategoryItem>
+            {
+                Success = true,
+                Message = "Lấy danh mục thành công",
+                Data = category
+            };
+        }
+
         public async Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category)
         {
             // Lấy danh mục theo ID

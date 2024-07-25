@@ -40,6 +40,21 @@ namespace Server.Controllers
             }
         }
 
+        [HttpGet("name/{name}")]
+        public async Task<IActionResult> GetCategoryByName(string name)
+        {
+            var result = await categoryRepo.GetCategoryByName(name);
+
+            if (result.Success == true)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result);
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddCategory(CreateCategoryDTO category)

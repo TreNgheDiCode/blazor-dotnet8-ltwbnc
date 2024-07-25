@@ -10,19 +10,61 @@ namespace ClientAdminLibrary.Services.Implementations
     {
         public const string DiscountUrl = "api/discounts";
 
-        public Task<GeneralResponse> CreateDiscount(CreateDiscountDTO discount)
+        public async Task<GeneralResponse> CreateDiscount(CreateDiscountDTO discount)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PostAsJsonAsync(DiscountUrl, discount);
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Thêm giảm giá thành công");
+            }
+
+            var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+            return errorResponse ?? new GeneralResponse(false, "Thêm giảm giá thất bại");
         }
 
-        public Task<GeneralResponse> DeleteDiscount(int id)
+        public async Task<GeneralResponse> DeleteDiscount(int id)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.DeleteAsync($"{DiscountUrl}/{id}");
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Xóa giảm giá thành công");
+            }
+
+            var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+            return errorResponse ?? new GeneralResponse(false, "Xóa giảm giá thất bại");
         }
 
-        public Task<ServiceModel<DiscountItem>> GetDiscount(int id)
+        public async Task<ServiceModel<DiscountItem>> GetDiscount(int id)
         {
-            throw new NotImplementedException();
+            var client = httpClient.GetPublicHttpClient();
+
+            var result = await client.GetFromJsonAsync<ServiceModel<DiscountItem>>($"{DiscountUrl}/{id}");
+
+            // Nếu không có kết quả thì trả về thông báo lỗi
+            if (result == null)
+            {
+                return new ServiceModel<DiscountItem>()
+                {
+                    Data = null,
+                    Message = "Lỗi máy chủ",
+                    Success = false
+                };
+            }
+
+            return result;
         }
 
         public async Task<ServiceModel<DiscountList>> GetDiscounts()
@@ -45,9 +87,22 @@ namespace ClientAdminLibrary.Services.Implementations
             return result;
         }
 
-        public Task<GeneralResponse> UpdateDiscount(int id, UpdateDiscountDTO discount)
+        public async Task<GeneralResponse> UpdateDiscount(int id, UpdateDiscountDTO discount)
         {
-            throw new NotImplementedException();
+            var client = await httpClient.GetPrivateHttpClient();
+
+            var result = await client.PutAsJsonAsync($"{DiscountUrl}/{id}", discount);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var successResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+                return successResponse ?? new GeneralResponse(false, "Cập nhật giảm giá thành công");
+            }
+
+            var errorResponse = await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+            return errorResponse ?? new GeneralResponse(false, "Cập nhật giảm giá thất bại");
         }
     }
 }

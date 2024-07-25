@@ -18,13 +18,13 @@ namespace BaseLibrary.DTOs
         public string? CoverUrl { get; set; } // Đường dẫn ảnh bìa
         public string? Name { get; set; } // Tên sản phẩm
         public string? Description { get; set; } // Mô tả sản phẩm
-        public double? Price { get; set; } // Giá gốc
+        public double Price { get; set; } // Giá gốc
         public int? Discount { get; set; } // % Giảm giá
         public bool IsFlashSale { get; set; } // Có đang giảm giá
         public ProductStatus Status { get; set; } // Trạng thái sản phẩm
-        public string? CategoryName { get; set; } // Danh mục
-        public List<ProductItemImage>? ProductImages { get; set; } // Danh sách hình ảnh sản phẩm
-        public List<ProductItemOption>? ProductOptions { get; set; } // Danh sách tùy chọn sản phẩm
+        public string CategoryName { get; set; } = null!; // Danh mục
+        public List<ProductImageDTO> ProductImages { get; set; } = []; // Danh sách hình ảnh sản phẩm
+        public List<ProductOptionDTO> ProductOptions { get; set; } = []; // Danh sách tùy chọn sản phẩm
         public List<ProductItemReview>? ProductReviews { get; set; } // Danh sách đánh giá
     }
 
@@ -81,6 +81,8 @@ namespace BaseLibrary.DTOs
         [Required(ErrorMessage = "Danh mục không được để trống")]
         [Range(1, int.MaxValue, ErrorMessage = "Danh mục không hợp lệ")]
         public int CategoryId { get; set; } // ID danh mục
+        [Required(ErrorMessage = "Hình ảnh sản phẩm không được để trống")]
+        [MinLength(1, ErrorMessage = "Hình ảnh sản phẩm phải ít nhất 1")]
         public List<ProductImageDTO>? ProductImages { get; set; } // Danh sách hình ảnh sản phẩm
         [Required(ErrorMessage = "Tùy chọn sản phẩm không được để trống")]
         [MinLength(1, ErrorMessage = "Tùy chọn sản phẩm phải ít nhất 1")]

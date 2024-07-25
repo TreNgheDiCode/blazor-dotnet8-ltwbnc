@@ -386,7 +386,7 @@ else
             ServiceModel<UserItem> result = await userService.GetUser(int.Parse(Id));
 
             if (result.Success == true && result.Data != null)
-            {
+            {   
                 if (result.Data.Address != null)
                     userAddresses = result.Data.Address.Split(", ");
                 else

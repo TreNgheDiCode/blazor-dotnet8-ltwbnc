@@ -257,14 +257,12 @@ namespace ServerLibrary.Repositories.Implementations
                     IsFlashSale = p.IsFlashSale,
                     Status = p.Status,
                     CategoryName = p.Category!.Name,
-                    ProductImages = p.ProductImages.Select(pi => new ProductItemImage
+                    ProductImages = p.ProductImages.Select(pi => new ProductImageDTO
                     {
-                        Id = pi.Id,
                         ImageUrl = pi.Url
                     }).ToList(),
-                    ProductOptions = p.ProductOptions.Select(po => new ProductItemOption
+                    ProductOptions = p.ProductOptions.Select(po => new ProductOptionDTO
                     {
-                        Id = po.Id,
                         Color = po.Color,
                         Size = po.Size,
                         Quantity = po.Quantity
@@ -342,14 +340,12 @@ namespace ServerLibrary.Repositories.Implementations
                     IsFlashSale = p.IsFlashSale,
                     Status = p.Status,
                     CategoryName = p.Category!.Name,
-                    ProductImages = p.ProductImages.Select(pi => new ProductItemImage
+                    ProductImages = p.ProductImages.Select(pi => new ProductImageDTO
                     {
-                        Id = pi.Id,
                         ImageUrl = pi.Url
                     }).ToList(),
-                    ProductOptions = p.ProductOptions.Select(po => new ProductItemOption
+                    ProductOptions = p.ProductOptions.Select(po => new ProductOptionDTO
                     {
-                        Id = po.Id,
                         Color = po.Color,
                         Size = po.Size,
                         Quantity = po.Quantity
