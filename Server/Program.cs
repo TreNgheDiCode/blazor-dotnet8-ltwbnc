@@ -33,6 +33,7 @@ builder.Services.AddScoped<IUserRepo, UserRepo>();
 builder.Services.AddScoped<IDiscountRepo, DiscountRepo>();
 builder.Services.AddScoped<IOrderRepo, OrderRepo>();
 builder.Services.AddScoped<IAddressRepo, AddressRepo>();
+builder.Services.AddScoped<ICloudinaryRepo, CloudinaryRepo>();
 
 builder.Services.Configure<JwtSection>(builder.Configuration.GetSection("JwtSection"));
 var jwtSection = builder.Configuration.GetSection(nameof(JwtSection)).Get<JwtSection>();

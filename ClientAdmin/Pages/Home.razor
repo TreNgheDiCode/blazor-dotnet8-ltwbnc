@@ -1,20 +1,74 @@
 ﻿@page "/"
 
-@code {
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
 
-    protected async override Task OnInitializedAsync()
+<div class="bg-white shadow-lg p-2">
+    <h1 class="text-black
+         fs-5 mb-0">
+        <strong>
+            Super Sport | Trang điều khiển
+        </strong>
+    </h1>
+</div>
+
+@if (IsLoading == true)
+{
+    <div id="container">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
+    </div>
+}
+else
+{
+    <div class="px-4">
+        
+    </div>
+}
+
+
+@code {
+    private bool IsLoading { get; set; } = false;
+
+    private List<OrderItem>? Orders { get; set; } = new List<OrderItem>();
+    private List<ProductItem>? Products { get; set; } = new List<ProductItem>();
+
+    protected override async Task OnInitializedAsync()
     {
-        // Get the current user
-        var user = (await AuthenticationState).User;
-        if (user.Identity!.IsAuthenticated)
+        IsLoading = true;
+        // Lấy số lượng đơn hàng
+        // Lấy số lượng sản phẩm
+        try
         {
-            // User is authenticated
-            NavManager.NavigateTo("/");
+            // Lấy số lượng sản phẩm
+            ServiceModel<ProductList>? resultProduct = await productService.GetProducts();
+            // Lấy số lượng đơn hàng
+            ServiceModel<OrderList>? resultOrder = await orderService.GetOrders();
+
+            if (resultProduct.Success == true && resultProduct.Data is not null)
+            {
+                Products = resultProduct.Data.Products;
+            }
+
+            if (resultOrder.Success == true && resultOrder.Data is not null)
+            {
+                Orders = resultOrder.Data.Orders;
+            }
         }
-        else
+        catch (Exception)
         {
-            NavManager.NavigateTo("/auth/login");
+            // Lỗi kết nối máy chủ
+            await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy dữ liệu");
         }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task DisplayDialog(string content, string title)
+    {
+        await DialogService.AlertAsync(content, title);
     }
 }

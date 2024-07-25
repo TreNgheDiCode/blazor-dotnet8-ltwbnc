@@ -1,21 +1,23 @@
-﻿<div class="row category">
+﻿@inherits LayoutComponentBase
+
+<div class="row category">
     <div class="col">
         <div class="list-group list-group-horizontal">
             <div class="category-item"><a href="/">Trang Chủ</a></div>
             <div class="category-item dropdown">
-                <a class="dropdown-toggle">Danh Mục</a>
+                <a class="dropdown-toggle" data-bs-toggle="dropdown">Danh Mục</a>
                 @if (cate != null)
                 {
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu show">
                         @foreach (var item in cate.Categories)
                         {
-                            <li class="dropdown-item"><a href="/category/@item.Id">@item.Name</a></li>
+                            <li class="dropdown-item"><a href="/category/@item.Name">@item.Name</a></li>
                         }
                     </ul>
                 }
             </div>
             <div class="category-item"><a href="/news">Tin Tức</a></div>
-            <!-- Add other nav items here -->
+            <div class="category-item"><a href="/about">Về Chúng Tôi</a></div>
         </div>
     </div>
 </div>
@@ -25,10 +27,18 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Thêm console log để kiểm tra dữ liệu trả về
+        Console.WriteLine("Fetching categories...");
+
         ServiceModel<CategoryList> result = await categoryService.GetCategories(1, 1);
         if (result.Success == true)
         {
             cate = result.Data;
+            Console.WriteLine("Categories fetched successfully");
+        }
+        else
+        {
+            Console.WriteLine("Failed to fetch categories");
         }
     }
 }

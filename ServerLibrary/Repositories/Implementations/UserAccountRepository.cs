@@ -53,6 +53,8 @@ namespace ServerLibrary.Repositories.Implementations
                     ProvinceId = user.ProvinceId
                 },
                 CreatedAt = DateOnly.FromDateTime(DateTime.Now),
+                Photo = user.Photo,
+                Other = user.Other,
                 IsLocked = false
 
             });
@@ -74,6 +76,18 @@ namespace ServerLibrary.Repositories.Implementations
                 response = await AddToDatabase(new SystemRole() { Name = Constants.User });
                 await AddToDatabase(new UserRole() { RoleId = response.Id, UserId = applicationUser.Id });
                 return new GeneralResponse(true, "Khởi tạo vai trò người dùng thành công!");
+            }
+            // Kiểm tra vai trò có tồn tại không
+            else if (user.Role is not null)
+            {
+                var checkRole = await appDbContext.SystemRoles.FirstOrDefaultAsync(x => x.Name!.Equals(user.Role));
+
+                // Trả về thông báo lỗi
+                if (checkRole is null) return new GeneralResponse(false, "Vai trò không tồn tại");
+                else
+                {
+                    await AddToDatabase(new UserRole() { RoleId = checkRole.Id, UserId = applicationUser.Id });
+                }
             }
             else
             {
@@ -105,7 +119,7 @@ namespace ServerLibrary.Repositories.Implementations
             if (getRoleName is null) return new LoginResponse(false, "Không tìm thấy quyền hạn người dùng");
 
             // Nếu tài khoản bị khóa
-            if (applicationUser.IsLocked is not null && applicationUser.IsLocked == true)
+            if (applicationUser.IsLocked == true)
                 return new LoginResponse(false, "Tài khoản đã bị khóa");
 
             // Tạo token jwt
@@ -208,7 +222,7 @@ namespace ServerLibrary.Repositories.Implementations
         {
             return await appDbContext.ApplicationUsers.FirstOrDefaultAsync(x => x.Email!.ToLower().Equals(email!.ToLower()));
         }
-        
+
         private async Task<T> AddToDatabase<T>(T model)
         {
             var result = appDbContext.Add(model!);

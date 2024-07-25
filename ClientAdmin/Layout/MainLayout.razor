@@ -34,7 +34,7 @@
             <NavMenu SidebarToggle="@SidebarToggle" />
 
             <main class="page flex-grow-1 overflow-auto">
-                <article class="content px-4 w-100">
+                <article class="p-0 content w-100" style="padding-left:0 !important; padding-right:0 !important">
                     @Body
                 </article>
             </main>
@@ -48,12 +48,16 @@
 <Syncfusion.Blazor.Popups.SfDialogProvider />
 
 @code {
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    [CascadingParameter] 
+    public Task<AuthenticationState> AuthenticationState { get; set; }
 
     private async Task CheckUserAuthentication()
     {
+        if (AuthenticationState == null) return;
         var user = (await AuthenticationState).User;
-        bool isUserAuthenticated = user.Identity!.IsAuthenticated;
+        if (user?.Identity == null) return;
+        bool isUserAuthenticated = user.Identity.IsAuthenticated;
+
         if (!isUserAuthenticated)
         {
             NavManager.NavigateTo("/auth/login");
@@ -68,6 +72,12 @@
     {
         await CheckUserAuthentication();
         var user = (await AuthenticationState).User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            NavManager.NavigateTo("/auth/login");
+            return;
+        };
 
         Content += user.Identity!.Name;
     }
@@ -102,14 +112,18 @@
 }
 
 <style>
-    .e-toolbar .e-toolbar-items, .footer, .e-toolbar .e-toolbar-item .e-tbar-btn.e-btn {
+    .e-toolbar{
         background-color: #007bff;
-        color: white;
         font-size: 16px;
     }
 
+        .e-toolbar .e-toolbar-items, .footer, .e-toolbar .e-toolbar-item .e-tbar-btn.e-btn {
+            background: white;
+            color: #007bff;
+        }
+
     .e-dropdown-btn {
-        background-color: #007bff;
-        color: white;
+        background: white;
+        color: #007bff;
     }
 </style>

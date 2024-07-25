@@ -20,10 +20,16 @@ namespace ServerLibrary.Repositories.Implementations
                 return new GeneralResponse(false, "Danh mục đã tồn tại");
             }
 
+            // Nếu tên danh mục trống
+            if (string.IsNullOrWhiteSpace(category.Name))
+            {
+                return new GeneralResponse(false, "Tên danh mục không được để trống");
+            }
+
             // Tạo danh mục mới
             Category newCategory = new()
             {
-                Name = category.Name
+                Name = category.Name,
             };
 
             // Thêm danh mục mới vào cơ sở dữ liệu
@@ -119,6 +125,39 @@ namespace ServerLibrary.Repositories.Implementations
             // Lấy danh mục theo ID
             CategoryItem? category = await context.Categories
                 .Where(c => c.Id == id)
+                .Select(c => new CategoryItem
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    ProductCount = c.Products.Count
+                })
+                .FirstOrDefaultAsync();
+
+            // Nếu không tìm thấy danh mục
+            if (category == null)
+            {
+                return new ServiceModel<CategoryItem>
+                {
+                    Success = false,
+                    Message = "Không tìm thấy danh mục",
+                    Data = null
+                };
+            }
+
+            // Trả về danh mục
+            return new ServiceModel<CategoryItem>
+            {
+                Success = true,
+                Message = "Lấy danh mục thành công",
+                Data = category
+            };
+        }
+
+        public async Task<ServiceModel<CategoryItem>> GetCategoryByName(string name)
+        {
+            // Lấy danh mục theo tên
+            CategoryItem? category = await context.Categories
+                .Where(c => c.Name == name)
                 .Select(c => new CategoryItem
                 {
                     Id = c.Id,

@@ -13,6 +13,7 @@ namespace ServerLibrary.Repositories.Interfaces
         Task<GeneralResponse> UpdateProduct(int id, UpdateProductDTO product);
         Task<GeneralResponse> UpdateProductImage(int productId, int imageId, string imageUrl);
         Task<GeneralResponse> UpdateProductOption(int productId, int optionId, ProductOptionDTO productOption);
+        Task<GeneralResponse> FlashSale(int id);
         Task<GeneralResponse> DeleteProduct(int id);
         Task<GeneralResponse> DeleteProductImage(int productId, int imageId);
         Task<GeneralResponse> DeleteProductOption(int productId, int optionId);

@@ -10,6 +10,7 @@
     <title>Super Sport - Fashion Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,129 +18,90 @@
             padding: 0;
         }
 
+        .category-item .dropdown-menu {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+            .category-item .dropdown-toggle:hover + .dropdown-menu,
+            .category-item .dropdown-menu:hover {
+                display: block;
+            }
+
         .header-container {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
             background-color: white;
             color: black;
             padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .logo img {
-            height: 64px;
-            width: 128px;
+            height: 50px;
+            width: auto;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+            .nav-menu a {
+                text-decoration: none;
+                color: black;
+                padding: 8px 15px;
+                border-radius: 5px;
+                transition: background-color 0.3s, color 0.3s;
+            }
+
+                .nav-menu a:hover {
+                    background-color: #e2e2e2;
+                    color: black;
+                }
+
+        .search-wrapper {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: center;
         }
 
         .search-bar {
             display: flex;
             align-items: center;
-            flex-grow: 1;
-            justify-content: center;
+            gap: 5px;
+            width: 100%;
+            max-width: 500px;
         }
 
-        .form-control {
-            margin-right: 10px;
-            width: 300px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 5px;
-        }
-
-        .btn {
-            padding: 5px 15px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-            .btn:hover {
-                background-color: #218838;
+            .search-bar input {
+                width: 100%;
+                padding: 5px 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
             }
 
-        .category {
-            text-align: left;
-            padding: 15px 0;
-            background: linear-gradient(90deg, #32a852, #2a7d47);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .list-group-horizontal {
-            display: flex;
-            gap: 30px;
-        }
-
-        .category-item {
-            position: relative;
-        }
-
-            .category-item a,
-            .category-item .dropdown-toggle {
-                text-decoration: none;
-                color: white;
-                padding: 10px 20px;
-                display: block;
-                border-radius: 10px;
-                transition: background-color 0.3s, color 0.3s;
+            .search-bar button {
+                border: none;
+                background: transparent;
+                cursor: pointer;
+                padding: 0;
+                display: flex;
+                align-items: center;
             }
 
-                .category-item a:hover,
-                .category-item .dropdown-toggle:hover {
-                    background-color: greenyellow;
-                    color: black;
+                .search-bar button i {
+                    font-size: 1.3rem;
+                    color: #28a745;
                 }
-
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: #2a7d47;
-            border: none;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            padding: 0;
-            margin: 0;
-            border-radius: 10px;
-            overflow: hidden;
-            width: 200px; /* Adjust this as needed */
-        }
-
-        .dropdown-item {
-            display: block; /* Make sure the entire item is block-level */
-            padding: 0; /* Remove padding from the item itself */
-        }
-
-            .dropdown-item a {
-                color: white;
-                display: block;
-                font-family: Arial, sans-serif;
-                text-decoration: none;
-                padding: 10px 20px; /* Add padding to the anchor */
-                transition: background-color 0.3s, color 0.3s;
-            }
-
-                .dropdown-item a:hover {
-                    background-color: yellow;
-                    color: black;
-                }
-
-        .dropdown:hover .dropdown-menu {
-            display: block;
-        }
-
-        .container {
-            padding: 20px;
-            margin-bottom: 100px; /* Ensure footer doesn't overlap */
-        }
 
         .cart-login {
             display: flex;
@@ -147,89 +109,88 @@
             gap: 20px;
         }
 
-        .cart-icon,
-        .login-link {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .cart-icon, .login-link {
             text-decoration: none;
             color: black;
+            display: flex;
+            align-items: center;
         }
 
         .cart-icon {
-            position: relative;
+            position: relative; /* Đảm bảo biểu tượng giỏ hàng có vị trí tương đối */
         }
-
-            .cart-icon i,
-            .login-link i {
-                font-size: 1.5rem;
-            }
 
         .cart-count {
             position: absolute;
-            top: -5px;
-            right: -10px;
+            top: -10px; /* Điều chỉnh vị trí từ trên xuống */
+            right: -10px; /* Điều chỉnh vị trí từ phải sang */
             background-color: red;
             color: white;
             border-radius: 50%;
             padding: 2px 6px;
             font-size: 12px;
+            z-index: 1;
         }
 
-        .product-card {
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+        .container {
+            padding: 20px;
+            margin-bottom: 100px;
         }
-
-            .product-card img {
-                max-height: 200px;
-                object-fit: cover;
-                border-radius: 10px;
-            }
-
-            .product-card .card-title {
-                font-size: 1.2rem;
-                font-weight: bold;
-                margin-top: 10px;
-                margin-bottom: 5px;
-            }
-
-            .product-card .card-text {
-                font-size: 1rem;
-                margin-bottom: 10px;
-            }
-
-            .product-card .price {
-                font-size: 1.2rem;
-                font-weight: bold;
-                margin-bottom: 15px;
-            }
-
-            .product-card .btn {
-                background-color: #dc3545;
-                border-color: #dc3545;
-                color: white;
-            }
-
-                .product-card .btn:hover {
-                    background-color: #c82333;
-                    border-color: #bd2130;
-                }
 
         footer {
-            text-align: center;
-            background-color: #333;
-            color: #fff;
-            padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            background-color: #f5f5f5;
+            color: #333;
+            padding: 40px 0;
+            border-top: 1px solid #e7e7e7;
         }
+
+            footer h5 {
+                font-size: 18px;
+                margin-bottom: 20px;
+                color: #333;
+            }
+
+            footer ul {
+                list-style: none;
+                padding: 0;
+            }
+
+                footer ul li {
+                    margin-bottom: 10px;
+                }
+
+                    footer ul li a {
+                        color: #666;
+                        text-decoration: none;
+                    }
+
+                        footer ul li a:hover {
+                            color: #333;
+                        }
+
+            footer form {
+                display: flex;
+                flex-direction: column;
+            }
+
+                footer form input {
+                    margin-bottom: 10px;
+                    padding: 10px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+
+                footer form button {
+                    padding: 10px;
+                    background-color: #5cb85c;
+                    border: none;
+                    color: white;
+                    border-radius: 4px;
+                }
+
+                    footer form button:hover {
+                        background-color: #4cae4c;
+                    }
     </style>
 </head>
 <body>
@@ -237,20 +198,23 @@
         <div class="logo">
             <img src="logongang.png" alt="Logo">
         </div>
-        <div class="search-bar">
-            <input type="text" class="form-control" placeholder="Search products..." @bind="searchQuery">
-            <button class="btn" @onclick="SearchProducts">Tìm kiếm</button>
+        <div class="nav-menu">
+            <NavCategory />
+        </div>
+        <div class="search-wrapper">
+            <div class="search-bar">
+                <input type="text" class="form-control search-input" placeholder="Search products..." @bind="searchQuery" @onkeyup="HandleKeyUp">
+                <button class="btn" @onclick="SearchProducts"><i class="bi bi-search"></i></button>
+            </div>
         </div>
         <div class="cart-login">
             <a class="cart-icon" href="/cart/shoppingcart">
-                <i class="bi bi-cart"><span class="cart-count">@cartItemCount</span></i>
-                Giỏ hàng
+                <i class="bi bi-cart">
+                    <span class="cart-count">@cartItemCount</span>
+                </i>
             </a>
-            <a class="login-link" href="/auth/login"><i class="bi bi-person-circle"></i> Đăng nhập</a>
+            <a class="login-link" href="/auth/login"><i class="bi bi-person-circle"></i> Login</a>
         </div>
-    </div>
-    <div class="category">
-        <NavCategory />
     </div>
 
     <div class="container">
@@ -260,9 +224,46 @@
     </div>
 
     <footer>
-        <p>&copy; 2024 Super Sport. All rights reserved.</p>
+        <div class="container">
+            <div class="row">
+                <!-- About Us Section -->
+                <div class="col-md-3">
+                    <h5>About Us</h5>
+                    <p>We are a leading fashion store specializing in sportswear. Discover our latest collections and enjoy quality and style.</p>
+                </div>
+
+                <!-- Quick Links Section -->
+                <div class="col-md-3">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/">Products</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Us Section -->
+                <div class="col-md-3">
+                    <h5>Contact Us</h5>
+                    <p>Email: support@supersport.com</p>
+                    <p>Phone: +123 456 7890</p>
+                    <p>Address: 123 Fashion Street, Trendy City</p>
+                </div>
+
+                <!-- Newsletter Subscription -->
+                <div class="col-md-3">
+                    <h5>Subscribe to Our Newsletter</h5>
+                    <form>
+                        <input type="email" placeholder="Enter your email" required>
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
@@ -270,7 +271,6 @@
 @code {
     private string searchQuery = "";
     private int cartItemCount = 0;
-    private string errorMessage = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -291,18 +291,14 @@
 
     private void SearchProducts()
     {
-        if (!string.IsNullOrEmpty(searchQuery))
-        {
-            NavigationManager.NavigateTo($"/search/{searchQuery}");
-        }
-        else
-        {
-            ShowErrorMessage("vui lòng nhập tên sản phẩm.");
-        }
+        NavigationManager.NavigateTo($"/search/{searchQuery}");
     }
 
-    private void ShowErrorMessage(string message)
+    private void HandleKeyUp(KeyboardEventArgs e)
     {
-        errorMessage = message;
+        if (e.Key == "Enter")
+        {
+            SearchProducts();
+        }
     }
 }

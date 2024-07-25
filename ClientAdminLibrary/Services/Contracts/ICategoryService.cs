@@ -7,6 +7,7 @@ namespace ClientAdminLibrary.Services.Contracts
     {
         Task<ServiceModel<CategoryList>> GetCategories();
         Task<ServiceModel<CategoryItem>> GetCategory(int id);
+        Task<ServiceModel<CategoryItem>> GetCategoryByName(string name);
         Task<GeneralResponse> CreateCategory(CreateCategoryDTO category);
         Task<GeneralResponse> UpdateCategory(int id, UpdateCategoryDTO category);
         Task<GeneralResponse> DeleteCategory(int id);

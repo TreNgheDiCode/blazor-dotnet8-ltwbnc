@@ -16,14 +16,14 @@ namespace Server.Controllers
             return Ok(result);
         }
 
-        [HttpGet("provinces/${provinceCode}/districts")]
+        [HttpGet("provinces/{provinceCode}/districts")]
         public async Task<IActionResult> GetDistricts(string provinceCode)
         {
             var result = await addressRepo.GetDistricts(provinceCode);
             return Ok(result);
         }
 
-        [HttpGet("provinces/${provinceCode}/districts/${districtCode}/wards")]
+        [HttpGet("provinces/{provinceCode}/districts/{districtCode}/wards")]
         public async Task<IActionResult> GetWards(string provinceCode, string districtCode)
         {
             var result = await addressRepo.GetWards(provinceCode, districtCode);

@@ -1,58 +1,243 @@
 ﻿@page "/category"
 
+@using BaseLibrary.Responses
+@using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
 
-<SfGrid DataSource="@Categories" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
-    <GridTemplates>
-        <ToolbarTemplate>
-            <SfToolbar>
-                <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
-                <ToolbarItems>
-                    <div class="d-flex flex-column">
-                        <div>
-                            <ToolbarItem Text="Thêm"></ToolbarItem>
-                            <ToolbarItem Text="Cập nhật"></ToolbarItem>
-                            <ToolbarItem Text="Xóa"></ToolbarItem>
-                            <ToolbarItem Text="Sửa"></ToolbarItem>
-                            <ToolbarItem Text="Hủy"></ToolbarItem>
-                        </div>
-                        <div>
-                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
-                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
-                        </div>
-                    </div>
-                </ToolbarItems>
-            </SfToolbar>
-        </ToolbarTemplate>
-    </GridTemplates>
-    <GridGroupSettings Columns=@GroupOption>
-        <CaptionTemplate>
-            @{
-                var data = (context as CaptionTemplateContext);
-                <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
-            }
-        </CaptionTemplate>
-    </GridGroupSettings>
-    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
-    <GridPageSettings PageSize="5">
-    </GridPageSettings>
-    <GridColumns>
-        <GridColumn Field=@nameof(CategoryItem.Id) HeaderText="Mã danh mục"></GridColumn>
-        <GridColumn Field=@nameof(CategoryItem.Name) HeaderText="Tên danh mục"></GridColumn>
-        <GridColumn Field=@nameof(CategoryItem.ProductCount) HeaderText="Số lượng sản phẩm"></GridColumn>
-    </GridColumns>
-</SfGrid>
+<div class="bg-white shadow-lg p-2">
+    <h1 class="text-black
+         fs-5 mb-0">
+        <strong>
+            Quản lý danh mục
+        </strong>
+    </h1>
+</div>
+
+@if (IsLoading == true)
+{
+    <div id="container">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
+    </div>
+}
+else
+{
+    <div class="px-4">
+        <SfBreadcrumb class="my-2">
+            <BreadcrumbItems>
+                <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
+                <BreadcrumbItem Text="Danh mục" IconCss="bi bi-bookmark-fill"></BreadcrumbItem>
+                <BreadcrumbItem Text="Danh sách danh mục" IconCss="bi bi-bookmark-star"></BreadcrumbItem>
+            </BreadcrumbItems>
+            <BreadcrumbTemplates>
+                <ItemTemplate>
+                    <SfChip>
+                        <ChipItems>
+                            <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
+                        </ChipItems>
+                    </SfChip>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                    <span class="e-icons e-bullet-arrow"></span>
+                </SeparatorTemplate>
+            </BreadcrumbTemplates>
+        </SfBreadcrumb>
+
+        <SfGrid DataSource="@Categories" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid" AllowExcelExport="true" AllowReordering="true" Toolbar="@ToolbarItems" AllowPdfExport="true">
+            <GridGroupSettings Columns=@GroupOption>
+                <CaptionTemplate>
+                    @{
+                        var data = (context as CaptionTemplateContext);
+                        <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
+                    }
+                </CaptionTemplate>
+            </GridGroupSettings>
+            <GridEditSettings AllowAdding="true" AllowEditing="true" AllowDeleting="true" Mode="EditMode.Normal"></GridEditSettings>
+            <GridPageSettings PageSize="5">
+            </GridPageSettings>
+            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
+            <GridEvents TValue="CategoryItem" OnActionBegin="ActionBeginHandler" OnToolbarClick="ToolbarClickHandler"></GridEvents>
+            <GridColumns>
+                <GridColumn Field=@nameof(CategoryItem.Id) HeaderText="Mã danh mục" AllowEditing="false" AllowAdding="false">
+                </GridColumn>
+                <GridColumn Field=@nameof(CategoryItem.Name) HeaderText="Tên danh mục"></GridColumn>
+                <GridColumn Field=@nameof(CategoryItem.ProductCount) HeaderText="Số lượng sản phẩm" AllowEditing="false" AllowAdding="false">
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
 
 @code {
+    private bool IsLoading { get; set; } = false;
     // STT, Tên danh mục, Số luong sản phẩm, Thao tác
     public List<CategoryItem> Categories { get; set; } = new();
     private SfGrid<CategoryItem> Grid;
-    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
+    private List<string> ToolbarItems = new List<string>() { "Add", "Edit", "Delete", "Cancel", "Print", "ExcelExport", "PdfExport", "Refresh" };
     private string[] GroupOption = (new string[] { "Id" });
 
-    protected override async Task OnInitializedAsync()
+    public async void ActionBeginHandler(ActionEventArgs<CategoryItem> args)
     {
+        // Nếu trùng mã danh mục thì không cho thêm
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Add" && Categories.Any(x => x.Id == args.Data.Id))
+        {
+            args.Cancel = true;
+            await DisplayDialog("Mã danh mục đã tồn tại", "Lỗi thêm danh mục");
+            return;
+        }
+        // Nếu trùng tên danh mục thì không cho thêm
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Add" && Categories.Any(x => x.Name == args.Data.Name))
+        {
+            args.Cancel = true;
+            await DisplayDialog("Tên danh mục đã tồn tại", "Lỗi thêm danh mục");
+            return;
+        }
+
+        // Nếu trùng tên danh mục thì không cho sửa
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Edit" && Categories.Any(x => x.Name == args.Data.Name))
+        {
+            args.Cancel = true;
+            await DisplayDialog("Tên danh mục đã tồn tại", "Lỗi sửa danh mục");
+            return;
+        }
+        // Nếu không có dữ liệu thì không cho xóa
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete) && args.Data is null)
+        {
+            args.Cancel = true;
+            await DisplayDialog("Không có dữ liệu để xóa", "Lỗi xóa danh mục");
+            return;
+        }
+        // Nếu có sản phẩm trong danh mục thì không cho xóa
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete) && args.Data is not null && args.Data.ProductCount > 0)
+        {
+            args.Cancel = true;
+            await DisplayDialog("Danh mục này có sản phẩm, không thể xóa", "Lỗi xóa danh mục");
+            return;
+        }
+        // Nếu không có dữ liệu thì không cho cập nhật
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Edit" && args.Data is null)
+        {
+            args.Cancel = true;
+            await DisplayDialog("Không có dữ liệu để cập nhật", "Lỗi cập nhật danh mục");
+            return;
+        }
+        // Nếu có sản phẩm trong danh mục thì không cho cập nhật
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Edit" && args.Data is not null && args.Data.ProductCount > 0)
+        {
+            args.Cancel = true;
+            await DisplayDialog("Danh mục này có sản phẩm, không thể cập nhật", "Lỗi cập nhật danh mục");
+            return;
+        }
+        // Thêm danh mục
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Add" && args.Data is not null)
+        {
+            // Lấy mã danh mục lớn nhất + 1
+            int maxId = Categories.Max(x => x.Id);
+
+            args.Data.Id = maxId + 1;
+
+            try
+            {
+                CreateCategoryDTO categoryDTO = new()
+                    {
+                        Name = args.Data.Name,
+                    };
+
+                var result = await categoryService.CreateCategory(categoryDTO);
+
+                if (result.Flag == false)
+                {
+                    await DisplayDialog(result.Message, "Lỗi thêm danh mục");
+                }
+                else
+                {
+                    await DisplayDialog(result.Message, "Thông báo");
+                }
+
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi thêm danh mục");
+            }
+        }
+
+        // Cập nhật danh mục
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Save) && args.Action == "Edit" && args.Data is not null)
+        {
+            try
+            {
+                UpdateCategoryDTO categoryDTO = new()
+                    {
+                        Name = args.Data.Name,
+                    };
+
+                var result = await categoryService.UpdateCategory(args.Data.Id, categoryDTO);
+
+                if (result.Flag == false)
+                {
+                    await DisplayDialog(result.Message, "Lỗi cập nhật danh mục");
+                }
+                else
+                {
+                    await DisplayDialog(result.Message, "Thông báo");
+
+                    await Grid.EndEditAsync();
+                }
+
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi cập nhật danh mục");
+            }
+        }
+
+        // Xóa danh mục
+        if (args.RequestType.Equals(Syncfusion.Blazor.Grids.Action.Delete) && args.Data is not null)
+        {
+            try
+            {
+                var result = await categoryService.DeleteCategory(args.Data.Id);
+
+                if (result.Flag == false)
+                {
+                    await DisplayDialog(result.Message, "Lỗi xóa danh mục");
+                }
+                else
+                {
+                    await DisplayDialog(result.Message, "Thông báo");
+                }
+                await Grid.Refresh();
+            }
+            catch (Exception)
+            {
+                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi xóa danh mục");
+            }
+        }
+    }
+
+    public async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    {
+        if (args.Item.Text == "PDF Export")
+        {
+            await this.Grid.ExportToPdfAsync();
+        }
+        else if (args.Item.Text == "Excel Export")
+        {
+            await this.Grid.ExportToExcelAsync();
+        }
+
+        if (args.Item.Text == "Refresh")
+        {
+            await FetchData();
+        }
+    }
+
+    private async Task FetchData()
+    {
+        IsLoading = true;
         try
         {
             ServiceModel<CategoryList> result = await categoryService.GetCategories();
@@ -62,23 +247,19 @@
                 Categories = result.Data.Categories;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách danh mục");
         }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
-    public async Task ToolbarClickHandler(Syncfusion.Blazor.Navigations.ClickEventArgs args)
+    protected override async Task OnInitializedAsync()
     {
-        if (args.Item.Text == "Thu gọn")
-        {
-            await this.Grid.CollapseAllGroupAsync();
-        }
-        if (args.Item.Text == "Mở rộng")
-        {
-            await this.Grid.ExpandAllGroupAsync();
-            await this.Grid.CloseEditAsync();
-        }
+        await FetchData();
     }
 
     private async Task DisplayDialog(string content, string title)
@@ -86,3 +267,10 @@
         await DialogService.AlertAsync(content, title);
     }
 }
+
+<style>
+    .e-bullet-arrow::before {
+        content: '\e763';
+        font-size: 12px;
+    }
+</style>

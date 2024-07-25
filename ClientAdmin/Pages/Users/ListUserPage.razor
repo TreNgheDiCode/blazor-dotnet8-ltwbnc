@@ -1,95 +1,168 @@
 ﻿@page "/user"
 
+@using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Grids
 @using Syncfusion.Blazor.Navigations
+@using Syncfusion.Blazor.Spinner
 
+<div class="bg-white shadow-lg p-2">
+    <h1 class="text-black
+         fs-5 mb-0">
+        <strong>
+            Quản lý người dùng
+        </strong>
+    </h1>
+</div>
 
-<SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid">
-    <GridTemplates>
-        <ToolbarTemplate>
-            <SfToolbar>
-                <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
-                <ToolbarItems>
-                    <div class="d-flex flex-column">
-                        <div>
+@if (IsLoading == true)
+{
+    <div id="container">
+        <SfSpinner @bind-Visible="@IsLoading">
+        </SfSpinner>
+    </div>
+}
+else
+{
+    <div class="px-4">
+        <SfBreadcrumb class="my-2">
+            <BreadcrumbItems>
+                <BreadcrumbItem Text="Trang chủ" IconCss="bi bi-house-door-fill" Url="/"></BreadcrumbItem>
+                <BreadcrumbItem Text="Người dùng" IconCss="bi bi-people"></BreadcrumbItem>
+                <BreadcrumbItem Text="Danh sách người dùng" IconCss="bi bi-people-fill"></BreadcrumbItem>
+            </BreadcrumbItems>
+            <BreadcrumbTemplates>
+                <ItemTemplate>
+                    <SfChip>
+                        <ChipItems>
+                            <ChipItem Text="@context.Text" Enabled="true" LeadingIconCss="@context.IconCss"></ChipItem>
+                        </ChipItems>
+                    </SfChip>
+                </ItemTemplate>
+                <SeparatorTemplate>
+                    <span class="e-icons e-bullet-arrow"></span>
+                </SeparatorTemplate>
+            </BreadcrumbTemplates>
+        </SfBreadcrumb>
 
+        <SfGrid DataSource="@Users" AllowPaging="true" AllowSorting="true" AllowFiltering="true" AllowGrouping="true" @ref="Grid" AllowExcelExport="true">
+            <GridTemplates>
+                <ToolbarTemplate>
+                    <SfToolbar>
+                        <ToolbarEvents Clicked="ToolbarClickHandler"></ToolbarEvents>
+                        <ToolbarItems>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
+                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
                             <ToolbarItem Text="Thêm"></ToolbarItem>
                             <ToolbarItem Text="Cập nhật"></ToolbarItem>
                             <ToolbarItem Text="Xóa"></ToolbarItem>
-                            <ToolbarItem Text="Sửa"></ToolbarItem>
-                            <ToolbarItem Text="Hủy"></ToolbarItem>
-                        </div>
-                        <div>
-                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-up icon" Id="CollapseAll" Text="Thu gọn"></ToolbarItem>
-                            <ToolbarItem Type="@ItemType.Button" PrefixIcon="e-chevron-down icon" Id="ExpandAll" Text="Mở rộng"></ToolbarItem>
-                        </div>
-                    </div>
-                </ToolbarItems>
-            </SfToolbar>
-        </ToolbarTemplate>
-    </GridTemplates>
-    <GridGroupSettings Columns=@GroupOption>
-        <CaptionTemplate>
-            @{
-                var data = (context as CaptionTemplateContext);
-                <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
-            }
-        </CaptionTemplate>
-    </GridGroupSettings>
-    <GridEditSettings AllowAdding="true" AllowDeleting="true" AllowEditing="true"></GridEditSettings>
-    <GridPageSettings PageSize="5">
-    </GridPageSettings>
-    <GridColumns>
-        <GridColumn Field=@nameof(UserItem.Id) HeaderText="Mã người dùng"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.Fullname) HeaderText="Tên người dùng"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.Email) HeaderText="Email"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.CreatedAt) HeaderText="Ngày tạo" Format="dd/MM/yyyy" Type="ColumnType.DateOnly"></GridColumn>
-        <GridColumn Field=@nameof(UserItem.IsLocked) HeaderText="Khóa">
-            <Template>
-                @{
-                    var user = (context as UserItem);
-                    <div>
-                        @if (user!.IsLocked == true)
-                        {
-                            <span class="badge bg-danger">Đã khóa</span>
+                            <ToolbarItem Text="Xuất Excel"></ToolbarItem>
+                        </ToolbarItems>
+                    </SfToolbar>
+                </ToolbarTemplate>
+            </GridTemplates>
+            <GridGroupSettings Columns=@GroupOption>
+                <CaptionTemplate>
+                    @{
+                        var data = (context as CaptionTemplateContext);
+                        <span>@data.HeaderText - @data.Key (@data.Count dòng)</span>
+                    }
+                </CaptionTemplate>
+            </GridGroupSettings>
+            <GridEditSettings AllowAdding="true" AllowDeleting="true"></GridEditSettings>
+            <GridPageSettings PageSize="5">
+            </GridPageSettings>
+            <GridFilterSettings Type="Syncfusion.Blazor.Grids.FilterType.Excel"></GridFilterSettings>
+            <GridColumns>
+                <GridColumn Field=@nameof(UserItem.Id) HeaderText="Mã người dùng"></GridColumn>
+                <GridColumn Field=@nameof(UserItem.Fullname) HeaderText="Tên người dùng">
+                    <Template>
+                        @{
+                            var user = (context as UserItem);
+                            <div class="d-flex gap-2 flex-row align-items-center">
+                                <div class="e-avatar e-avatar-large e-avatar-circle">
+                                    <img src="@user.Photo" alt="Ảnh đại diện" />
+                                </div>
+                                <span>@user.Fullname</span>
+                            </div>
                         }
-                        else
-                        {
-                            <span class="badge bg-success">Đang kích hoạt</span>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(UserItem.Email) HeaderText="Email"></GridColumn>
+                <GridColumn Field=@nameof(UserItem.CreatedAt) HeaderText="Ngày tạo" Format="dd/MM/yyyy" Type="ColumnType.DateOnly"></GridColumn>
+                <GridColumn Field=@nameof(UserItem.IsLocked) HeaderText="Khóa">
+                    <Template>
+                        @{
+                            var user = (context as UserItem);
+
+                            <div class="d-flex flex-row align-items-center justify-content-center">
+                                <SfSwitch @bind-Checked="user.IsLocked" CssClass="custom-iOS" TChecked="bool" ValueChange="@(args => OnLockUser(args, user.Id))"></SfSwitch>
+                            </div>
                         }
-                    </div>
-                }
-            </Template>
-        </GridColumn>
-        <GridColumn Field=@nameof(UserItem.Role) HeaderText="Vai trò">
-            <Template>
-                @{
-                    var user = (context as UserItem);
-                    <div>
-                        @if (user!.Role == "Admin")
-                        {
-                            <span class="badge bg-danger">Quản trị viên</span>
+                    </Template>
+                </GridColumn>
+                <GridColumn Field=@nameof(UserItem.Role) HeaderText="Vai trò">
+                    <Template>
+                        @{
+                            var user = (context as UserItem);
+                            <div>
+                                @if (user!.Role == "Admin")
+                                {
+                                    <span class="badge bg-danger">Quản trị viên</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Người dùng</span>
+                                }
+                            </div>
                         }
-                        else
-                        {
-                            <span class="badge bg-success">Người dùng</span>
-                        }
-                    </div>
-                }
-            </Template>
-        </GridColumn>
-    </GridColumns>
-</SfGrid>
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+        </SfGrid>
+    </div>
+}
 
 @code {
+    private bool IsLoading { get; set; } = false;
     // STT, Tên, Email, Ngày tạo, Khóa, Ủy quyền, Thao tác
     public List<UserItem> Users { get; set; } = new();
     private SfGrid<UserItem> Grid;
-    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Sửa", "Hủy" };
+    private List<string> ToolbarItems = new List<string>() { "Thêm", "Cập nhật", "Xóa", "Xuất Excel" };
     private string[] GroupOption = (new string[] { "Id" });
+
+    private async void OnLockUser(ChangeEventArgs<bool> args, int id)
+    {
+        if (args.Checked == true)
+        {
+            var res = await userService.LockUser(id);
+
+            if (res.Flag == true)
+            {
+                await DisplayDialog(res.Message, "Thông báo");
+            }
+            else
+            {
+                await DisplayDialog(res.Message, "Thông báo");
+            }
+        }
+        else
+        {
+            var res = await userService.LockUser(id);
+
+            if (res.Flag == true)
+            {
+                await DisplayDialog(res.Message, "Thông báo");
+            }
+            else
+            {
+                await DisplayDialog(res.Message, "Thông báo");
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
+        IsLoading = true;
         try
         {
             ServiceModel<UserList> result = await userService.GetUsers();
@@ -99,9 +172,13 @@
                 Users = result.Data.Users;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách người dùng");
+        }
+        finally
+        {
+            IsLoading = false;
         }
     }
 
@@ -116,6 +193,78 @@
             await this.Grid.ExpandAllGroupAsync();
             await this.Grid.CloseEditAsync();
         }
+        if (args.Item.Text == "Thêm")
+        {
+            NavManager.NavigateTo("/user/create");
+        }
+        if (args.Item.Text == "Cập nhật")
+        {
+            var selectedRecords = await this.Grid.GetSelectedRecordsAsync();
+
+            if (selectedRecords.Count == 0)
+            {
+                await DisplayDialog("Chọn một dòng để cập nhật", "Thông báo");
+            }
+            else
+            {
+                NavManager.NavigateTo($"/user/update/{selectedRecords[0].Id}");
+            }
+        }
+        if (args.Item.Text == "Xóa")
+        {
+            var selectedRecords = await this.Grid.GetSelectedRecordsAsync();
+
+            if (selectedRecords.Count == 0)
+            {
+                await DisplayDialog("Chọn một dòng để xóa", "Thông báo");
+            }
+            else
+            {
+                var result = await DialogService.ConfirmAsync("Bạn có chắc chắn muốn xóa người dùng này?", "Xác nhận xóa");
+
+                if (result == true)
+                {
+                    try
+                    {
+                        var res = await userService.DeleteUser(selectedRecords[0].Id);
+
+                        if (res.Flag == true)
+                        {
+                            await DisplayDialog("Xóa người dùng thành công", "Thông báo");
+
+                            try
+                            {
+                                // Tải lại bảng
+                                ServiceModel<UserList> users = await userService.GetUsers();
+
+                                if (users.Success == true && users.Data is not null)
+                                {
+                                    Users = users.Data.Users;
+                                }
+
+                                await this.Grid.Refresh();
+                            }
+                            catch (Exception)
+                            {
+                                await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi lấy danh sách người dùng");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayDialog(res.Message, "Thông báo");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        await DisplayDialog("Kiểm tra lại kết nối máy chủ", "Lỗi xóa người dùng");
+                    }
+                }
+            }
+        }
+        if (args.Item.Text == "Xuất Excel")
+        {
+            await this.Grid.ExportToExcelAsync();
+        }
     }
 
     private async Task DisplayDialog(string content, string title)
@@ -123,3 +272,30 @@
         await DialogService.AlertAsync(content, title);
     }
 }
+
+<style>
+    .e-bullet-arrow::before {
+        content: '\e763';
+        font-size: 12px;
+    }
+
+    .e-switch-wrapper.custom-iOS .e-switch-inner.e-switch-active,
+    .e-switch-wrapper.custom-iOS:hover .e-switch-inner.e-switch-active .e-switch-on {
+        background-color: #3df865;
+        border-color: #3df665;
+    }
+
+    .e-switch-wrapper.custom-iOS {
+        width: 42px;
+        height: 24px;
+    }
+
+        .e-switch-wrapper.custom-iOS .e-switch-handle {
+            width: 20px;
+            height: 20px;
+        }
+
+            .e-switch-wrapper.custom-iOS .e-switch-handle.e-switch-active {
+                margin-left: -22px;
+            }
+</style>
