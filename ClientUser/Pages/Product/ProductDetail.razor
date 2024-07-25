@@ -2,144 +2,207 @@
 @using ClientUserLibrary.Services.Contracts
 
 @inject IProductsService productService
+@inject IJSRuntime JSRuntime
 
 <h3>Chi tiết sản phẩm</h3>
 
 <style>
+    /* General Page Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
     .product-page {
         display: flex;
-        margin-top: 20px;
+        flex-wrap: nowrap;
+        justify-content: center;
+        margin: 20px auto;
+        max-width: 1200px;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     .product-image {
-        width: 40%;
+        flex: 1;
+        max-width: 500px;
         margin-right: 20px;
     }
 
+        .product-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
     .product-info {
-        width: 60%;
+        flex: 2;
+        max-width: 700px;
     }
 
     .product-title {
-        font-size: 24px;
+        font-size: 2rem;
         font-weight: bold;
         margin-bottom: 10px;
+        color: #333;
     }
 
     .product-price {
-        font-size: 20px;
+        font-size: 1.5rem;
         font-weight: bold;
         color: #ff0000;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 
     .product-details {
         margin-bottom: 20px;
+        line-height: 1.6;
     }
 
     .product-variations {
         display: flex;
-        justify-content: flex-start;
-        align-items: center;
+        flex-direction: column;
+        gap: 10px;
         margin-bottom: 20px;
     }
 
-    .product-variations label {
-        font-weight: bold;
-        margin-right: 10px;
-    }
+        .product-variations label {
+            font-weight: bold;
+        }
 
-    .product-variations select {
-        width: 150px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
-
-    .product-variations input {
-        width: 50px;
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        text-align: center;
-    }
+        .product-variations select,
+        .product-variations input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
 
     .product-actions {
         display: flex;
-        justify-content: space-around;
-        align-items: center;
+        gap: 15px;
+        margin-top: 20px;
     }
 
-    .product-actions button {
-        padding: 10px 10px;
-        border: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+        .product-actions button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
 
-    .product-actions button.add-to-cart {
-        background-color: #ff0000;
-        color: white;
-    }
+            .product-actions button.add-to-cart {
+                background-color: #28a745;
+                color: white;
+            }
 
-    .product-actions button.wishlist {
-        background-color: #ff69b4;
-        color: white;
-    }
+            .product-actions button.wishlist {
+                background-color: #ff69b4;
+                color: white;
+            }
 
-    .product-actions button.find-store {
-        background-color: #008000;
-        color: white;
-    }
+            .product-actions button.add-to-cart:hover {
+                background-color: #218838;
+            }
 
-    .product-images {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .product-images img {
-        width: 100%;
-        height: auto;
-        margin-bottom: 10px;
-    }
+            .product-actions button.wishlist:hover {
+                background-color: #ff1493;
+            }
 
     .breadcrumb {
         display: flex;
         list-style: none;
         padding: 0;
         margin-bottom: 20px;
+        font-size: 0.9rem;
     }
 
-    .breadcrumb li {
-        margin-right: 5px;
-    }
+        .breadcrumb li {
+            margin-right: 5px;
+        }
 
-    .breadcrumb li a {
-        text-decoration: none;
-        color: #007bff;
-    }
+            .breadcrumb li a {
+                text-decoration: none;
+                color: #007bff;
+            }
 
-    .breadcrumb li::after {
-       
-        margin-left: 5px;
-    }
+            .breadcrumb li::after {
+                content: ">";
+                margin-left: 5px;
+                color: #007bff;
+            }
 
-    .breadcrumb li:last-child::after {
-        content: "";
-    }
+            .breadcrumb li:last-child::after {
+                content: "";
+            }
 
     .rating {
+        display: flex;
+        align-items: center;
         color: #ffcc00;
         margin-bottom: 10px;
+        font-size: 1.2rem;
     }
+
+        .rating span {
+            margin-left: 5px;
+            font-size: 1rem;
+            color: #333;
+        }
+
+    /* Spinner Style */
+    .spinner-border {
+        width: 2rem;
+        height: 2rem;
+        border-width: 0.25em;
+    }
+
+    .breadcrumb-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: #f1f1f1;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+        .quantity-selector button {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .quantity-selector input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
 </style>
 
 @if (loading)
 {
-    <div class="mt-auto">
-        <button class="btn btn-primary float-start" type="button" disabled>
+    <div class="mt-auto text-center">
+        <button class="btn btn-primary" type="button" disabled>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Đang tải...
         </button>
@@ -152,7 +215,8 @@ else
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/">Trang Chủ</a></li>
-                <li class="breadcrumb-item active" aria-current="page">@products.Name</li>
+                <li class="breadcrumb-item"><a href="/category/@products.CategoryName">@products.CategoryName</a></li>
+                <li class="breadcrumb-item active" aria-current="page"><b>| @products.Name</b></li>
             </ol>
         </nav>
 
@@ -163,30 +227,30 @@ else
             <div class="product-info">
                 <h3 class="product-title">@products.Name</h3>
                 <div class="rating">
-                            <div>Đánh giá: @(products.ProductReviews.FirstOrDefault()?.Rating)</div>
+                    <span>⭐</span>
+                    <span>⭐</span>
+                    <span>⭐</span>
+                    <span>⭐</span>
+                    <span></span>
                 </div>
                 <div class="product-price">@string.Format("{0:0,0 đồng}", products.Price)</div>
                 <div class="product-details">@products.Description</div>
-                <div class="product-details">Số Lượng: @products.ProductOptions.Sum(i=>i.Quantity) Sản phẩm</div>
+                <div class="product-details">Số Lượng: Số Lượng: @selectedQuantity Sản phẩm</div>
                 <div class="product-variations">
                     <label for="size">Chọn kích thước:</label>
                     <select id="size" @onchange="OnSizeChanged">
-                        @foreach (var option in products.ProductOptions)
+                        @foreach (var option in products.ProductOptions.Select(o => o.Size).Distinct())
                         {
-                            <option value="@option.Size">@option.Size</option>
+                            <option value="@option">@option</option>
                         }
                     </select>
-
-               
-
-
                 </div>
                 <div class="product-variations">
-                    <label for="size">Chọn màu sắc:</label>
-                    <select id="Color" @onchange="OnColorChanged">
-                        @foreach (var option in products.ProductOptions)
+                    <label for="color">Chọn màu sắc:</label>
+                    <select id="color" @onchange="OnColorChanged">
+                        @foreach (var option in products.ProductOptions.Select(o => o.Color).Distinct())
                         {
-                            <option value="@option.Color">@option.Color</option>
+                            <option value="@option">@option</option>
                         }
                     </select>
                 </div>
@@ -211,11 +275,14 @@ else
     private ProductItem? products;
     private string message = string.Empty;
     private ProductCartItem product;
-    private string selectedSize=string.Empty;
+    private string selectedSize = string.Empty;
     private string selectedColor = string.Empty;
+    private int selectedQuantity = 0;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadProducts();
+        UpdateSelectedQuantity();
     }
 
     private async Task LoadProducts()
@@ -223,10 +290,9 @@ else
         try
         {
             var result = await productService.GetProduct(ProductId);
-            if (result.Success == true && result.Data?.Id != null)
+            if (result.Success ==true && result.Data?.Id != null)
             {
                 products = result.Data;
-                // Thiết lập giá trị mặc định cho selectedSize và selectedColor
                 selectedSize = products.ProductOptions.FirstOrDefault()?.Size ?? string.Empty;
                 selectedColor = products.ProductOptions.FirstOrDefault()?.Color ?? string.Empty;
             }
@@ -246,10 +312,9 @@ else
         }
     }
 
-  
     private async Task AddToCart()
     {
-        if (products != null)
+        if (products != null && selectedQuantity > 0) // Kiểm tra nếu sản phẩm không null và số lượng lớn hơn 0
         {
             product = new ProductCartItem
                 {
@@ -260,23 +325,38 @@ else
                     Discount = products.Discount,
                     IsFlashSale = products.IsFlashSale,
                     Status = products.Status,
-                    color = selectedColor, // Đảm bảo giá trị này được cập nhật đúng
-                    size = selectedSize, // Đảm bảo giá trị này được cập nhật đúng
+                    color = selectedColor,
+                    size = selectedSize,
                     img = products.ProductImages[0].ImageUrl,
                     ProductItemOptions = products.ProductOptions.Sum(i => i.Quantity)
                 };
             await CartService.AddItemToCart(product, 1);
             await JSRuntime.InvokeVoidAsync("alert", "Sản phẩm đã được thêm vào giỏ hàng thành công!");
         }
+        else
+        {
+            // Hiển thị thông báo không thể thêm sản phẩm vì số lượng là 0
+            await JSRuntime.InvokeVoidAsync("alert", "Sản phẩm này hiện không có sẵn. Vui lòng chọn sản phẩm khác.");
+        }
     }
+
     private void OnSizeChanged(ChangeEventArgs e)
     {
         selectedSize = e.Value.ToString();
+        UpdateSelectedQuantity();
     }
 
     private void OnColorChanged(ChangeEventArgs e)
     {
         selectedColor = e.Value.ToString();
+        UpdateSelectedQuantity();
     }
-
+    private void UpdateSelectedQuantity()
+    {
+        if (products != null && products.ProductOptions != null)
+        {
+            var option = products.ProductOptions.FirstOrDefault(o => o.Color == selectedColor && o.Size == selectedSize);
+            selectedQuantity = option != null ? option.Quantity : 0;
+        }
+    }
 }
